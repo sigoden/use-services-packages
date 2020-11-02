@@ -1,17 +1,16 @@
 import { Config } from "use-services";
 import * as template from "lodash.template";
 
-export type Service<T> = { [k in keyof T]: Factory };
+export type Service<S> = { [k in keyof S]: Factory };
 
-export interface Args {
-  [k: string]: ErrorParams;
-}
-
-export async function init(config: Config, args: Args): Promise<Service<Args>> {
+export async function init<A extends {[k: string]: ErrorParams}>(
+  _config: Config, 
+  args: A,
+): Promise<Service<A>> {
   return Object.keys(args).reduce((acc, cur) => {
     acc[cur] = new Factory(cur, args[cur])
     return acc;
-  }, {})
+  }, {}) as Service<A>;
 }
 
 export interface ErrorParams {

@@ -1,12 +1,17 @@
 import * as IORedis from "ioredis";
 import { Config, Ctor, STOP_KEY } from "use-services";
 
-export type Service<T extends Redis> = T;
+export type Service<S extends Redis> = S;
+export type Args = IORedis.RedisOptions;
 
-export async function init<T extends Redis>(config: Config, args: IORedis.RedisOptions, ctor?: Ctor<T>): Promise<Service<T>> {
+export async function init<S extends Redis>(
+  _config: Config, 
+  args: Args, 
+  ctor?: Ctor<S>
+): Promise<Service<S>> {
   const srv = new (ctor || Redis)(args);
-  return new Promise<Service<T>>((resolve, reject) => {
-    srv.once("connect", () => resolve(srv as Service<T>));
+  return new Promise((resolve, reject) => {
+    srv.once("connect", () => resolve(srv as Service<S>));
     srv.once("error", err => reject(err));
   });
 }
