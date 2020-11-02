@@ -1,0 +1,9 @@
+{
+  "name": "httperror",
+  "version": "1.0.0",
+  "license": "MIT",
+  "dependencies": {
+    "lodash.template": "^4.5.0",
+    "use-services": "^0.1.0"
+  }
+}
