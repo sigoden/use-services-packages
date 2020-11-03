@@ -1,7 +1,7 @@
-import { Config } from "use-services";
+import { ServiceOption, InitOption } from "use-services";
 
-export type Service<S> = S;
+export type Option<A> = ServiceOption<A, A>
 
-export async function init<A>(config: Config, args: A): Promise<Service<A>> {
-  return args;
+export async function init<A>(option: InitOption<A, A>): Promise<A> {
+  return option.args;
 }

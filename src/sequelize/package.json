@@ -1,8 +1,9 @@
 {
-  "name": "echo",
+  "name": "sequelize",
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
+    "sequelize": "^6.3.5",
     "use-services": "0.2.0"
   }
 }

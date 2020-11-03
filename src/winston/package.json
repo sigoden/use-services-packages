@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
-    "use-services": "^0.1.2",
+    "use-services": "0.2.0",
     "winston": "^3.3.3"
   }
 }

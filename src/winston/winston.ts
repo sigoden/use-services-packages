@@ -1,8 +1,6 @@
 import * as winston from "winston";
-import { Config, Ctor } from "use-services";
+import { ServiceOption, InitOption } from "use-services";
 const { combine, json, timestamp } = winston.format;
-
-export type Service<T extends Logger> = T;
 
 export interface Args {
   console?: winston.transports.ConsoleTransportOptions;
@@ -13,23 +11,26 @@ export interface Args {
   format?: winston.Logform.Format,
 }
 
-export async function init<T extends Logger>(config: Config, args: Args, ctor?: Ctor<T>): Promise<Service<T>> {
-  const srv = new (ctor || Logger)(config, args);
-  return srv as Service<T>;
+export type Option<S extends Service> = ServiceOption<Args, S>
+
+export async function init<S extends Service>(option: InitOption<Args, S>): Promise<S> {
+  const srv = new (option.ctor || Service)(option);
+  return srv as S;
 }
 
-export class Logger {
+export class Service {
   public readonly loggers?: winston.Logger[];
   private args: Args;
-  constructor(config: Config, args: Args) {
-    this.args = args;
+  constructor(option: InitOption<Args, Service>) {
+    const args = this.args = option.args;
     this.loggers = [];
     this.args.formatErrors = this.args.formatErrors || [];
     const level = this.args.level || "info";
     const format = this.args.format || combine(timestamp(), json());
-    const defaultMeta = { service: config.ns };
+    const defaultMeta = { service: option.app };
     const transports = [];
-    if (args.console) {
+    const consoleOptions = args.console || { level: "info" };
+    if (consoleOptions) {
       transports.push(new winston.transports.Console(args.console))
     }
     if (args.http) {

@@ -1,47 +1,56 @@
-import { Config } from "use-services";
-import * as template from "lodash.template";
+import { ServiceOption, InitOption } from "use-services";
+import { template } from "lodash";
 
-export type Service<S> = { [k in keyof S]: Factory };
+export type Service<A> = { [k in keyof A]: ErrorFactory<ExtractService<A[k]>> };
+export type Option<A> = ServiceOption<A, Service<A>>;
 
-export async function init<A extends {[k: string]: ErrorParams}>(
-  _config: Config, 
-  args: A,
+type ExtractService<Type> = Type extends ErrorParams<infer K> ? K & CallArgs: CallArgs;
+
+export async function init<A extends {[k: string]: ErrorParams<CallArgs>}>(
+  option: InitOption<A, Service<A>>
 ): Promise<Service<A>> {
-  return Object.keys(args).reduce((acc, cur) => {
-    acc[cur] = new Factory(cur, args[cur])
+  return Object.keys(option.args).reduce((acc, cur) => {
+    acc[cur] = new ErrorFactory(cur, option.args[cur])
     return acc;
   }, {}) as Service<A>;
 }
 
-export interface ErrorParams {
+interface ErrorParams<K extends CallArgs> {
   message: string;
   status: number;
+  args: K,
 }
 
-export interface CallArgs {
+interface CallArgs {
   [k: string]: any;
   extra?: any;
 }
 
-export class HttpErr extends Error {
+export class HttpError<K extends CallArgs> extends Error {
   public readonly status: number;
-  public readonly args: CallArgs;
-  constructor(msg: string, f: Factory, args: CallArgs) {
+  public readonly extra?: any;
+  constructor(msg: string, code: string, status: number, extra?: any) {
     super(msg);
-    this.name = f.code;
-    this.status = f.status;
-    this.args = args;
+    this.name = code;
+    this.extra = extra;
+  }
+  public toJSON() {
+    return {
+      code: this.name,
+      message: this.message,
+      extra: this.extra,
+    }
   }
 }
 
-export class Factory {
+export class ErrorFactory<K extends CallArgs> {
   public readonly status: number;
   public readonly code: string;
-  private createMessage: (args: CallArgs) => string;
-  constructor(code: string, params: ErrorParams) {
+  private createMessage: (args: K) => string;
+  constructor(code: string, params: ErrorParams<K>) {
     this.code = code;
     this.status = params.status;
-    this.createMessage = (args: CallArgs) => {
+    this.createMessage = (args: K) => {
       try {
         return template(params.message)(args);
       } catch (err) {
@@ -49,14 +58,17 @@ export class Factory {
       }
     };
   }
-  public json(args: CallArgs) {
+  public toJson(args?: K) {
     return {
       code: this.code,
       message: this.createMessage(args),
-      extra: (args && args.extra) ? args.extra : undefined,
+      extra: this.extra(args),
     };
   }
-  public toError(args?: CallArgs) {
-    return new HttpErr(this.createMessage(args), this, args);
+  public toError(args?: K) {
+    return new HttpError(this.createMessage(args), this.code, this.status, this.extra(args));
+  }
+  extra(args: K) {
+    return (args && args.extra) ? args.extra : undefined;
   }
 }

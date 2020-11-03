@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
-    "use-services": "^0.1.0"
+    "@types/ioredis": "^4.17.7",
+    "use-services": "0.2.0"
   }
 }
