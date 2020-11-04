@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "sequelize": "^6.3.5",
-    "use-services": "0.2.0"
+    "use-services": "0.2.2"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.3.3",
