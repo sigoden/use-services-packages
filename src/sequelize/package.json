@@ -4,6 +4,6 @@
   "license": "MIT",
   "dependencies": {
     "sequelize": "^6.3.5",
-    "use-services": "0.2.2"
+    "use-services": "0.2.6"
   }
 }

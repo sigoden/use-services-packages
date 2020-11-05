@@ -17,8 +17,7 @@ export async function init<S extends Service>(
   const { database, username, password, options } = option.args;
   const srv = new (option.ctor || Service)(database, username, password, options);
   await srv.authenticate();
-  const models = await option.args.load(srv);
-  Object.assign(srv, models);
+  await option.args.load(srv);
   return srv as S;
 }
 
