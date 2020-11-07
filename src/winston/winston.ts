@@ -6,12 +6,12 @@ export interface Args {
   console?: winston.transports.ConsoleTransportOptions;
   file?: winston.transports.FileTransportOptions;
   http?: winston.transports.HttpTransportOptions;
-  formatErrors?: { ErrType: typeof Error, format: (e: Error) => any }[]
+  formatErrors?: { ErrType: typeof Error; format: (e: Error) => any }[];
   level?: string;
-  format?: winston.Logform.Format,
+  format?: winston.Logform.Format;
 }
 
-export type Option<S extends Service> = ServiceOption<Args, S>
+export type Option<S extends Service> = ServiceOption<Args, S>;
 
 export async function init<S extends Service>(option: InitOption<Args, S>): Promise<S> {
   const srv = new (option.ctor || Service)(option);
@@ -31,7 +31,7 @@ export class Service {
     const transports = [];
     const consoleOptions = args.console || { level: "info" };
     if (consoleOptions) {
-      transports.push(new winston.transports.Console(args.console))
+      transports.push(new winston.transports.Console(args.console));
     }
     if (args.http) {
       transports.push(new winston.transports.Http(args.http));
@@ -81,5 +81,5 @@ export class Service {
 }
 
 function isPlainObject(obj: any) {
-  return Object.prototype.toString.call(obj) === "[object Object]"
+  return Object.prototype.toString.call(obj) === "[object Object]";
 }

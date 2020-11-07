@@ -5,6 +5,6 @@
   "dependencies": {
     "@types/bull": "^3.14.4",
     "bull": "^3.18.1",
-    "use-services": "0.2.6"
+    "use-services": "0.2.8"
   }
 }

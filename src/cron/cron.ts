@@ -15,6 +15,7 @@ export interface Args<A extends Handlers> {
   };
   handlers: A;
   boot?: () => Promise<any>,
+  bullOptions?: Pick<Bull.QueueOptions, "defaultJobOptions" | "limiter" | "settings">,
 }
 
 export type Deps = [IORedisService, WinstonService];
@@ -57,6 +58,7 @@ export class Service<A extends Handlers> {
         return new IORedis(this.redis.options);
       },
       prefix: this.app,
+      ...(this.args.bullOptions || {}),
     });
     if (this.args.boot) await this.args.boot();
     const jobs = await this.queue.getRepeatableJobs();
@@ -87,6 +89,7 @@ export class Service<A extends Handlers> {
       name,
       {},
       {
+        jobId: name,
         repeat: { cron: this.args.crons[name] },
         removeOnComplete: true,
         removeOnFail: true,

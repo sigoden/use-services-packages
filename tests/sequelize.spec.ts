@@ -11,7 +11,7 @@ const Models = {
 
 const load = async () => {
   return Models;
-}
+};
 const options = {
   sql: {
     init: Sequelize.init,
@@ -24,7 +24,7 @@ const options = {
       load,
     },
   } as Sequelize.Option<typeof Models, Sequelize.Service>,
-}
+};
 
 async function run() {
   let srvs: Services<typeof options>;

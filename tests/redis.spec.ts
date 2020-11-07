@@ -7,8 +7,8 @@ const options = {
     init: IORedis.init,
     args: {
     },
-  } as IORedis.Option<IORedis.Service>
-}
+  } as IORedis.Option<IORedis.Service>,
+};
 
 async function run() {
   let srvs: Services<typeof options>;

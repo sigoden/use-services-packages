@@ -7,8 +7,8 @@ const options = {
     init: Winston.init,
     args: {
     },
-  } as Winston.Option<Winston.Service>
-}
+  } as Winston.Option<Winston.Service>,
+};
 
 async function run() {
   let srvs: Services<typeof options>;

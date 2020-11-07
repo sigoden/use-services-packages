@@ -10,7 +10,7 @@ export async function init<A extends {[k: string]: ErrorParams<CallArgs>}>(
   option: InitOption<A, Service<A>>
 ): Promise<Service<A>> {
   return Object.keys(option.args).reduce((acc, cur) => {
-    acc[cur] = new ErrorFactory(cur, option.args[cur])
+    acc[cur] = new ErrorFactory(cur, option.args[cur]);
     return acc;
   }, {}) as Service<A>;
 }
@@ -18,7 +18,7 @@ export async function init<A extends {[k: string]: ErrorParams<CallArgs>}>(
 interface ErrorParams<K extends CallArgs> {
   message: string;
   status: number;
-  args: K,
+  args: K;
 }
 
 interface CallArgs {
@@ -39,7 +39,7 @@ export class HttpError<K extends CallArgs> extends Error {
       code: this.name,
       message: this.message,
       extra: this.extra,
-    }
+    };
   }
 }
 
