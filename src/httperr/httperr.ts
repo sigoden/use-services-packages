@@ -4,9 +4,9 @@ import { template } from "lodash";
 export type Service<A> = { [k in keyof A]: ErrorFactory<ExtractService<A[k]>> };
 export type Option<A> = ServiceOption<A, Service<A>>;
 
-type ExtractService<Type> = Type extends ErrorParams<infer K> ? K & CallArgs: CallArgs;
+type ExtractService<Type> = Type extends ErrorParams<infer K> ? K & CallArgs : CallArgs;
 
-export async function init<A extends {[k: string]: ErrorParams<CallArgs>}>(
+export async function init<A extends { [k: string]: ErrorParams<CallArgs> }>(
   option: InitOption<A, Service<A>>
 ): Promise<Service<A>> {
   return Object.keys(option.args).reduce((acc, cur) => {
@@ -32,6 +32,7 @@ export class HttpError<K extends CallArgs> extends Error {
   constructor(msg: string, code: string, status: number, extra?: any) {
     super(msg);
     this.name = code;
+    this.status = status;
     this.extra = extra;
   }
   public toJSON() {
