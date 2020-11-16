@@ -1,5 +1,4 @@
 import { Services, useServices } from "use-services";
-import { EventEmitter } from "events";
 import * as HttpErr from "../src/httperr/httperr";
 
 const errors = {

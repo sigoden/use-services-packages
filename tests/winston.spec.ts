@@ -1,5 +1,4 @@
 import { useServices, Services } from "use-services";
-import { EventEmitter } from "events";
 import  * as Winston from "../src/winston/winston";
 
 const options = {

@@ -1,5 +1,4 @@
 import { Services, useServices } from "use-services";
-import { EventEmitter } from "events";
 import * as IORedis from "../src/ioredis/ioredis";
 
 const options = {

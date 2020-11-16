@@ -12,7 +12,7 @@ export type Args = {
 export type Option<S extends Service> = ServiceOption<Args, S>;
 
 export async function init<S extends Service>(
-  option: InitOption<Args, S> 
+  option: InitOption<Args, S>,
 ): Promise<S> {
   const { database, username, password, options } = option.args;
   const srv = new (option.ctor || Service)(database, username, password, options);

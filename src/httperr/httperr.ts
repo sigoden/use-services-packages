@@ -7,7 +7,7 @@ export type Option<A> = ServiceOption<A, Service<A>>;
 type ExtractService<Type> = Type extends ErrorParams<infer K> ? K & CallArgs : CallArgs;
 
 export async function init<A extends { [k: string]: ErrorParams<CallArgs> }>(
-  option: InitOption<A, Service<A>>
+  option: InitOption<A, Service<A>>,
 ): Promise<Service<A>> {
   return Object.keys(option.args).reduce((acc, cur) => {
     acc[cur] = new ErrorFactory(cur, option.args[cur]);
@@ -35,6 +35,7 @@ export class HttpError<K extends CallArgs> extends Error {
     this.status = status;
     this.extra = extra;
   }
+
   public toJSON() {
     return {
       code: this.name,
@@ -59,6 +60,7 @@ export class ErrorFactory<K extends CallArgs> {
       }
     };
   }
+
   public toJson(args?: K) {
     return {
       code: this.code,
@@ -66,9 +68,11 @@ export class ErrorFactory<K extends CallArgs> {
       extra: this.extra(args),
     };
   }
+
   public toError(args?: K) {
     return new HttpError(this.createMessage(args), this.code, this.status, this.extra(args));
   }
+
   extra(args: K) {
     return (args && args.extra) ? args.extra : undefined;
   }
