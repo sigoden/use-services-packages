@@ -1,5 +1,4 @@
 import { Services, useServices } from "use-services";
-import { EventEmitter } from "events";
 import * as HttpErr from "../src/httperr/httperr";
 
 const errors = {
@@ -11,19 +10,19 @@ const errors = {
     status: 400,
     message: "${message}",
     args: {
-      message: "bad argument"
-    }
-  }
-}
+      message: "bad argument",
+    },
+  },
+};
 
 const options = {
   errs: {
     args: errors,
     init: HttpErr.init,
   } as HttpErr.Option<typeof errors>,
-}
+};
 
 async function run() {
   let srvs: Services<typeof options>;
-  srvs.errs.ErrBadArg.toError({ message: "bad arguments" })
+  srvs.errs.ErrBadArg.toError({ message: "bad arguments" });
 }

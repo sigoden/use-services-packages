@@ -1,5 +1,4 @@
 import { Services, useServices } from "use-services";
-import { EventEmitter } from "events";
 import * as IORedis from "../src/ioredis/ioredis";
 
 const options = {
@@ -7,8 +6,8 @@ const options = {
     init: IORedis.init,
     args: {
     },
-  } as IORedis.Option<IORedis.Service>
-}
+  } as IORedis.Option<IORedis.Service>,
+};
 
 async function run() {
   let srvs: Services<typeof options>;
