@@ -14,7 +14,6 @@ export interface Args<A extends Handlers> {
     [k in keyof A]: string;
   };
   handlers: A;
-  boot?: () => Promise<any>,
   bullOptions?: Pick<Bull.QueueOptions, "defaultJobOptions" | "limiter" | "settings">,
 }
 
@@ -60,7 +59,6 @@ export class Service<A extends Handlers> {
       prefix: this.app,
       ...(this.args.bullOptions || {}),
     });
-    if (this.args.boot) await this.args.boot();
     const jobs = await this.queue.getRepeatableJobs();
     const { handlers, crons } = this.args;
     await Promise.all(Object.keys(crons).map(async name => {
