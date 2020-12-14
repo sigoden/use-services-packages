@@ -5,8 +5,7 @@ import { Service as IORedisService  } from "../ioredis/ioredis";
 import { Service as WinstonService  } from "../winston/winston";
 import * as IORedis from "ioredis";
 
-
-export type Option<A extends Handlers, S extends Service<A>> = ServiceOption<Args<A>, S>; 
+export type Option<A extends Handlers, S extends Service<A>> = ServiceOption<Args<A>, S>;
 
 export type Handlers = {[k: string]: () => Promise<any>};
 export interface Args<A extends Handlers> {
@@ -21,7 +20,7 @@ export interface Args<A extends Handlers> {
 export type Deps = [IORedisService, WinstonService];
 
 export async function init<A extends Handlers, S extends Service<A>>(
-  option: InitOption<Args<A>, S>, 
+  option: InitOption<Args<A>, S>,
 ): Promise<S> {
   const srv = new (option.ctor || Service)(option);
   return srv as S;
@@ -45,15 +44,17 @@ export class Service<A extends Handlers> {
     this.logger = option.deps[1];
     pEvent(option.emitter, eventNames.initAll).then(() => this.start());
   }
+
   public async [STOP_KEY]() {
     if (!this.queue) return;
     await this.queue.close();
   }
+
   async start() {
     this.queue = new Bull(this.srvName, {
       createClient: type => {
         if (type === "client") {
-          return this.redis; 
+          return this.redis;
         }
         return new IORedis(this.redis.options);
       },
@@ -66,7 +67,7 @@ export class Service<A extends Handlers> {
     await Promise.all(Object.keys(crons).map(async name => {
       this.queue.process(name, () => {
         if (handlers[name]) {
-          this.wrapCall(handlers[name]);
+          this.wrapCall(name, handlers[name]);
         } else {
           this.logger.error("miss handler", { topic: `cron.${name}` });
         }
@@ -84,6 +85,7 @@ export class Service<A extends Handlers> {
     }));
     await Promise.all(jobs.map(job => this.queue.removeRepeatableByKey(job.key)));
   }
+
   addCron(name: string) {
     return this.queue.add(
       name,
@@ -96,14 +98,14 @@ export class Service<A extends Handlers> {
       },
     );
   }
-  async wrapCall(call: () => Promise<any>) {
+
+  async wrapCall(name: string, call: () => Promise<any>) {
     try {
       await call();
     } catch (err) {
       this.logger.error(err, {
-        topic: "cron." + call.name,
+        topic: "cron." + name,
       });
     }
   }
 }
-

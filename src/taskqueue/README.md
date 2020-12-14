@@ -28,9 +28,16 @@ export type PropType<TObj, TProp extends keyof TObj> = TObj[TProp];
 // in handlersTaskQueue.ts
 
 import * as Bull from "bull";
+import { Handler } from "@/lib/services/taskqueue";
 import { TaskQueueInputs, PropType } from "@/type";
 
-export async function heartBeat(job: Bull.Job<PropType<TaskQueueData, "heartBeat">>) {
-
-}
+export const heartBeat: Handler = {
+  concurrency: 99,
+  defaultOpts: {
+    removeOnComplete: true,
+    removeOnFail: true,
+  },
+  async fn(job: Bull.Job<PropType<TaskQueueData, "heartBeat">>) {
+  },
+};
 ```
