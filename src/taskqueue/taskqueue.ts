@@ -62,7 +62,7 @@ export class Service<A> {
 
   public async enqueue<K extends keyof A>(name: K, data: A[K], opts?: Bull.JobOptions & { force?: boolean }): Promise<Bull.Job> {
     const handler = this.args.handlers[name];
-    if (opts.jobId && opts.force) {
+    if (opts?.jobId && opts?.force) {
       const job = await this.queue.getJob(opts.jobId);
       if (job) await job.remove();
     }
