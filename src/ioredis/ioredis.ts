@@ -1,4 +1,4 @@
-import * as IORedis from "ioredis";
+import IORedis from "ioredis";
 import { ServiceOption, InitOption, STOP_KEY } from "use-services";
 
 export type Args = IORedis.RedisOptions;

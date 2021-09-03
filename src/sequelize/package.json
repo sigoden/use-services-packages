@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
-    "sequelize": "^6.3.5",
+    "sequelize": "^6.6.5",
     "use-services": "0.2.8"
   }
 }
