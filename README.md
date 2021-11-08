@@ -1,4 +1,4 @@
-# use-services-example
+# use-services-packages
 
 ## [cron](./packages/cron/README.md)
 ## [echo](./packages/echo/README.md)

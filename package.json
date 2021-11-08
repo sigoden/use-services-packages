@@ -1,5 +1,5 @@
 {
-  "name": "use-services-example",
+  "name": "use-services-packages",
   "version": "0.1.0",
   "scripts": {
     "lint": "eslint . --ext js --ext ts",
