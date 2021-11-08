@@ -1,6 +1,6 @@
 ```ts
 // in services.ts
-import * as Cron from "@/lib/services/cron";
+import * as Cron from "@use-services/cron";
 import * as handlersCron from "@/handlersCron";
 
 const options = {

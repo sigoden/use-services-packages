@@ -1,9 +1,9 @@
 # use-services-example
 
-## [cron](./src/cron/README.md)
-## [echo](./src/echo/README.md)
-## [httperr](./src/httperr/README.md)
-## [ioredis](./src/ioredis/README.md)
-## [sequelize](./src/sequelize/README.md)
-## [taskqueue](./src/taskqueue/README.md)
-## [winston](./src/winston/README.md)
+## [cron](./packages/cron/README.md)
+## [echo](./packages/echo/README.md)
+## [httperr](./packages/httperr/README.md)
+## [ioredis](./packages/ioredis/README.md)
+## [sequelize](./packages/sequelize/README.md)
+## [taskqueue](./packages/taskqueue/README.md)
+## [winston](./packages/winston/README.md)

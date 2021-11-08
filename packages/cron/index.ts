@@ -1,8 +1,8 @@
 import { ServiceOption, InitOption, STOP_KEY, eventNames } from "use-services";
 import Bull from "bull";
-import pEvent from "p-event";
-import { Service as IORedisService  } from "../ioredis/ioredis";
-import { Service as WinstonService  } from "../winston/winston";
+import { pEvent } from "p-event";
+import { Service as IORedisService  } from "@use-services/ioredis";
+import { Service as WinstonService  } from "@use-services/winston";
 import IORedis from "ioredis";
 
 export type Option<A extends Handlers, S extends Service<A>> = ServiceOption<Args<A>, S>;

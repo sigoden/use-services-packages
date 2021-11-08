@@ -1,5 +1,5 @@
-import { useServices, Services } from "use-services";
-import * as Echo from "../src/echo/echo";
+import { Services } from "use-services";
+import * as Echo from ".";
 
 const settings =  {
   k: "v",

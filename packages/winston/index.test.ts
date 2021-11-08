@@ -1,5 +1,5 @@
-import { useServices, Services } from "use-services";
-import  * as Winston from "../src/winston/winston";
+import { Services } from "use-services";
+import  * as Winston from ".";
 
 const options = {
   logger: {

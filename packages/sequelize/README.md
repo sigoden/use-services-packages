@@ -1,6 +1,6 @@
 ```ts
 // in services.ts
-import * as Sequelize from "@/lib/services/sequelize";
+import * as Sequelize from "@use-services/sequelize";
 
 const options = {
   sql: {

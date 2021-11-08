@@ -1,6 +1,6 @@
 ```ts
 // in services.ts
-import * as Echo from "@/lib/services/echo";
+import * as Echo from "@use-services/echo";
 
 import * as settings from "@/settings";
 

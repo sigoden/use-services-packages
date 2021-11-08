@@ -1,5 +1,5 @@
-import { Services, useServices } from "use-services";
-import * as HttpErr from "../src/httperr/httperr";
+import { Services } from "use-services";
+import * as HttpErr from ".";
 
 const errors = {
   ErrBad: {

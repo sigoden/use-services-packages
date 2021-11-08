@@ -1,6 +1,6 @@
 ```ts
 // in services.ts
-import * as Winston from "@/lib/services/winston";
+import * as Winston from "@use-services/winston";
 
 const options = {
   logger: {

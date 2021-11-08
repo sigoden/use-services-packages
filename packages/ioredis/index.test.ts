@@ -1,5 +1,5 @@
-import { Services, useServices } from "use-services";
-import * as IORedis from "../src/ioredis/ioredis";
+import { Services } from "use-services";
+import * as IORedis from ".";
 
 const options = {
   redis: {

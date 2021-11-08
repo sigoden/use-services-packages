@@ -1,5 +1,5 @@
-import { Services, useServices } from "use-services";
-import * as Sequelize from "../src/sequelize/sequelize";
+import { Services } from "use-services";
+import * as Sequelize from ".";
 import { Model } from "sequelize";
 
 class User extends Model { }

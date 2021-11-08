@@ -1,8 +1,8 @@
 {
-  "name": "echo",
+  "name": "@use-services/echo",
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
-    "use-services": "0.2.8"
+    "use-services": "^0.2.8"
   }
 }

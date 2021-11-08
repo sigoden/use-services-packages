@@ -1,9 +1,9 @@
 {
-  "name": "httperr",
+  "name": "@use-services/httperr",
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
     "lodash": "^4.17.21",
-    "use-services": "0.2.8"
+    "use-services": "^0.2.8"
   }
 }

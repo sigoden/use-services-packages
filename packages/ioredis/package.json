@@ -1,9 +1,9 @@
 {
-  "name": "redis",
+  "name": "@use-services/ioredis",
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
     "@types/ioredis": "^4.27.1",
-    "use-services": "0.2.8"
+    "use-services": "^0.2.8"
   }
 }

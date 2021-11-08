@@ -1,6 +1,6 @@
 ```ts
 // in services.ts
-import * as TaskQueue from "@/lib/services/taskqueue";
+import * as TaskQueue from "@use-services/taskqueue";
 import * as handlersTaskQueue from "@/handlersTaskQueue";
 
 
@@ -11,7 +11,7 @@ const options = {
     args: {
       handlers: handlersTaskQueue,
     },
-  } as TaskQueue.Option<TaskQueueInputs, TaskQueue.Service<TaskQueueInputs>>,
+  } as TaskQueue.Option<TaskQueueData, TaskQueue.Service<TaskQueueData>>,
 };
 
 // in type.ts
@@ -28,8 +28,8 @@ export type PropType<TObj, TProp extends keyof TObj> = TObj[TProp];
 // in handlersTaskQueue.ts
 
 import * as Bull from "bull";
-import { Handler } from "@/lib/services/taskqueue";
-import { TaskQueueInputs, PropType } from "@/type";
+import { Handler } from "@use-services/taskqueue";
+import { TaskQueueData, PropType } from "@/type";
 
 export const heartBeat: Handler = {
   concurrency: 99,
