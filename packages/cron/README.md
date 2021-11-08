@@ -1,24 +1,25 @@
 ```ts
-// in services.ts
-import * as Cron from "@use-services/cron";
+import * as Cron from "@/lib/services/cron";
 import * as handlersCron from "@/handlersCron";
 
 const options = {
   cron: {
     init: Cron.init,
     args: {
+      pollInterval: 500,
       handlers: handlersCron,
       crons: {
-        every3Minute: "0 0 * * * *",
+        everyFiveMinite: "*/5 * * * *",
       },
     },
-    deps: ["redis", "logger"],
+    deps: ["redis"],
   } as Cron.Option<typeof handlersCron, Cron.Service<typeof handlersCron>>,
-};
+}
 
-// in handlersCron.ts
+// in @/handlersCron.ts
+import { Context } from "@/lib/services/cron";
 
-export async function every3Minute() {
+export async function everyFiveMinite(ctx: Context) {
 
 }
 ```

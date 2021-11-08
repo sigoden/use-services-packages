@@ -1,10 +1,9 @@
 {
-  "name": "cron",
+  "name": "@use-services/alisms",
   "version": "0.2.0",
   "license": "MIT",
   "dependencies": {
     "use-services": "^0.2.8",
-    "@use-services/ioredis": "workspace:^",
-    "cron-parser": "^3.5.0"
+    "@alicloud/pop-core": "^1.7.10"
   }
 }

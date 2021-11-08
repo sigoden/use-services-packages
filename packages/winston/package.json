@@ -1,6 +1,6 @@
 {
   "name": "@use-services/winston",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "license": "MIT",
   "dependencies": {
     "use-services": "^0.2.8",

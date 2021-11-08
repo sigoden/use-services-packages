@@ -1,10 +1,11 @@
 {
-  "name": "cron",
+  "name": "delayqueue",
   "version": "0.2.0",
   "license": "MIT",
   "dependencies": {
     "use-services": "^0.2.8",
     "@use-services/ioredis": "workspace:^",
-    "cron-parser": "^3.5.0"
+    "lodash": "^4.17.21",
+    "p-limit": "^4.0.0"
   }
 }

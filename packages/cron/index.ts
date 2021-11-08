@@ -1,109 +1,143 @@
 import { ServiceOption, InitOption, STOP_KEY, eventNames } from "use-services";
-import Bull from "bull";
-import { pEvent } from "p-event";
-import { Service as IORedisService  } from "@use-services/ioredis";
-import { Service as WinstonService  } from "@use-services/winston";
-import IORedis from "ioredis";
+import cronParser from "cron-parser";
+import { Service as IORedisService } from "@use-services/ioredis";
 
-export type Option<A extends Handlers, S extends Service<A>> = ServiceOption<Args<A>, S>;
+export type Option<A, S extends Service<A>> = ServiceOption<Args<A>, S>;
 
-export type Handlers = {[k: string]: () => Promise<any>};
-export interface Args<A extends Handlers> {
-  crons: {
-    [k in keyof A]: string;
-  };
+export interface Args<A> {
+  pollInterval?: number; // 轮询redis间隔,单位豪秒
+  crons: {[k in keyof A]: string};
   handlers: A;
-  bullOptions?: Pick<Bull.QueueOptions, "defaultJobOptions" | "limiter" | "settings">,
 }
 
-export type Deps = [IORedisService, WinstonService];
+export type Deps = [IORedisService];
 
-export async function init<A extends Handlers, S extends Service<A>>(
+export async function init<A, S extends Service<A>>(
   option: InitOption<Args<A>, S>,
 ): Promise<S> {
   const srv = new (option.ctor || Service)(option);
+  option.emitter.on(eventNames.initAll, () => srv.__init__());
   return srv as S;
 }
 
-export class Service<A extends Handlers> {
-  private queue: Bull.Queue;
-  private redis: IORedisService;
+const lockScript = `
+  if redis.call("exists", KEYS[1]) == 1 then
+    return 0
+  end
+  redis.call("set", KEYS[1], ARGV[1], "PX", ARGV[2])
+  return 1
+`;
+
+
+export type Context = {
+  name: string;
+  cron: string;
+  nextRunAt: Date;
+  runAts: Date[];
+};
+
+export class Service<A> {
   private args: Args<A>;
-  private logger: WinstonService;
-  private app: string;
-  private srvName: string;
+  private redis: IORedisService;
+  private initialized = false;
+  private lastLock = false;
+  private ns: string;
+  private timer: NodeJS.Timeout; // eslint-disable-line
   constructor(option: InitOption<Args<A>, Service<A>>) {
-    if (option.deps.length !== 2) {
-      throw new Error("miss deps [redis, logger]");
+    if (option.deps.length !== 1) {
+      throw new Error("miss deps [redis]");
     }
-    this.app = option.app;
-    this.srvName = option.srvName;
-    this.args = option.args;
+    this.ns = option.app + ":" + option.srvName;
     this.redis = option.deps[0];
-    this.logger = option.deps[1];
-    pEvent(option.emitter, eventNames.initAll).then(() => this.start());
+    this.args = Object.assign({
+      pollInterval: 500,
+    }, option.args);
+    this._checkHandlers();
+  }
+
+  public async __init__() {
+    if (this.initialized) {
+      return;
+    }
+    this._addInterval();
+    await this._runinterval();
+    this.initialized = true;
   }
 
   public async [STOP_KEY]() {
-    if (!this.queue) return;
-    await this.queue.close();
+    clearTimeout(this.timer);
   }
 
-  async start() {
-    this.queue = new Bull(this.srvName, {
-      createClient: type => {
-        if (type === "client") {
-          return this.redis;
-        }
-        return new IORedis(this.redis.options);
-      },
-      prefix: this.app,
-      ...(this.args.bullOptions || {}),
-    });
-    const jobs = await this.queue.getRepeatableJobs();
-    const { handlers, crons } = this.args;
-    await Promise.all(Object.keys(crons).map(async name => {
-      this.queue.process(name, () => {
-        if (handlers[name]) {
-          this.wrapCall(name, handlers[name]);
-        } else {
-          this.logger.error("miss handler", { topic: `cron.${name}` });
-        }
-      });
-      const idx = jobs.findIndex(v => v.name === name);
-      if (idx > -1) {
-        const job = jobs.splice(idx, 1)[0];
-        if (job.cron !== crons[name]) {
-          await this.queue.removeRepeatableByKey(job.key);
-          await this.addCron(name);
-        }
-      } else {
-        await this.addCron(name);
+  private _addInterval() {
+    let timeoutMs: number;
+    if (this.lastLock) {
+      timeoutMs = this.args.pollInterval + 50;
+    } else {
+      timeoutMs = this.args.pollInterval  + 100 * (Math.random() - 0.5);
+    }
+    if (this.timer) clearTimeout(this.timer);
+    this.timer = setTimeout(() => this._runinterval(), timeoutMs);
+  }
+
+  private async _runinterval() {
+    this._addInterval();
+    const keyLock = this._redisKey("lock");
+
+    // 只有一个进程获得了锁
+    const result = await this.redis.eval(lockScript, 1, keyLock, "", this.args.pollInterval * 1.1);
+    if (result === 0) return;
+    this.lastLock = true;
+
+    const now = Date.now();
+    const sec = Math.floor(Date.now() / 1000);
+    const keyLastRunAts = this._redisKey("lastRunAts");
+    const lastRunAtsRaw = await this.redis.get(keyLastRunAts) || "{}";
+    const lastRunAts = JSON.parse(lastRunAtsRaw);
+    Object.keys(this.args.crons).forEach(name => lastRunAts[name] || (lastRunAts[name] = "" + sec));
+    const schedules = await this._getSchedules(now, lastRunAts);
+    schedules.map(async ctx => {
+      if (ctx.runAts.length > 0) {
+        lastRunAts[ctx.name] = Math.floor(ctx.runAts[ctx.runAts.length - 1].getTime() / 1000);
+        const handler = this.args.handlers[ctx.name];
+        if (handler) await handler(ctx);
       }
-    }));
-    await Promise.all(jobs.map(job => this.queue.removeRepeatableByKey(job.key)));
+    });
+    await this.redis.set(keyLastRunAts, JSON.stringify(lastRunAts));
   }
 
-  addCron(name: string) {
-    return this.queue.add(
-      name,
-      {},
-      {
-        jobId: name,
-        repeat: { cron: this.args.crons[name] },
-        removeOnComplete: true,
-        removeOnFail: true,
-      },
-    );
+  private _redisKey(...args: string[]) {
+    return this.ns + ":" + args.join(":");
   }
 
-  async wrapCall(name: string, call: () => Promise<any>) {
-    try {
-      await call();
-    } catch (err) {
-      this.logger.error(err, {
-        topic: "cron." + name,
-      });
+  private async _getSchedules(now: number, lastRunAts: { [k: string]: string }): Promise<Context[]> {
+    const result = [];
+    for (const name in this.args.crons) {
+      const cron = this.args.crons[name];
+      const currentDate = new Date(parseInt(lastRunAts[name]) * 1000);
+      const interval = cronParser.parseExpression(cron, { currentDate: currentDate });
+      const runAts = [];
+      while (true) {
+        const obj = interval.next();
+        if (obj.getTime() > now) {
+          result.push({ name, cron, runAts, nextRunAt: obj });
+          break;
+        }
+        runAts.push(obj);
+      }
+    }
+    return result;
+  }
+
+  private _checkHandlers() {
+    const { crons, handlers } = this.args;
+    const misHandlers = [];
+    Object.keys(crons).forEach(key => {
+      if (!handlers[key]) {
+        misHandlers.push(key);
+      }
+    });
+    if (misHandlers.length > 0) {
+      throw new Error(`cron: miss handlers ${misHandlers.join(",")}`);
     }
   }
 }
