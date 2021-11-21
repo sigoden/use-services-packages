@@ -1,3 +1,5 @@
+# Redis
+
 ```ts
 // in services.ts
 import * as IORedis from "@use-services/ioredis";

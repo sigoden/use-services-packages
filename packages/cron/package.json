@@ -1,5 +1,5 @@
 {
-  "name": "cron",
+  "name": "@use-services/cron",
   "version": "1.0.0",
   "keywords": ["use-services", "cron"],
   "author": "Sigoden Huang <sigoden@gmail.com> (https://sigoden.com/)",

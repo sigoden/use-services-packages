@@ -1,3 +1,5 @@
+# Winston
+
 ```ts
 // in services.ts
 import * as Winston from "@use-services/winston";

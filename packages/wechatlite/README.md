@@ -1,3 +1,5 @@
+# WechatLite
+
 ```ts
 import * as WechatLite from "@use-services/wechatlite";
 

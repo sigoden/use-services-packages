@@ -1,5 +1,5 @@
 {
-  "name": "delayqueue",
+  "name": "@use-services/delayqueue",
   "version": "1.0.0",
   "keywords": ["use-services", "delayqueue"],
   "author": "Sigoden Huang <sigoden@gmail.com> (https://sigoden.com/)",

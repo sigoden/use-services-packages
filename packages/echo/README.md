@@ -1,3 +1,5 @@
+# Echo
+
 ```ts
 // in services.ts
 import * as Echo from "@use-services/echo";

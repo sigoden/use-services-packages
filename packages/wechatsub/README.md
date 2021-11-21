@@ -1,3 +1,5 @@
+# WechatPub
+
 ```ts
 // in services.ts
 import * as WechatSub from "@use-services/wechatpub";
