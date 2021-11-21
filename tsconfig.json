@@ -2,11 +2,9 @@
   "compilerOptions": {
     "module": "commonjs",
     "declaration": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "target": "es2018",
     "sourceMap": true,
-    "lib": ["ES2018"],
+    "lib": ["ES2018"]
   }
 }
