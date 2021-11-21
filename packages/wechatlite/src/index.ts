@@ -6,10 +6,10 @@ import axios from "axios";
 export const timeout = 2500;
 export type Option<S extends Service> = ServiceOption<Args, S>;
 
-export interface Args extends WechatLiteArgs { }
+export interface Args extends WechatLiteArgs {}
 
 export async function init<S extends Service>(
-  option: InitOption<Args, S>,
+  option: InitOption<Args, S>
 ): Promise<S> {
   const srv = new (option.ctor || Service)(option.args);
   return srv as S;
@@ -31,7 +31,7 @@ export class Service {
   public wxBizDataDecrypt(
     sessionKeyRaw: string,
     encryptedDataRaw: string,
-    ivRaw: string,
+    ivRaw: string
   ) {
     const { appId } = this.args;
     const sessionKey = Buffer.from(sessionKeyRaw, "base64");
@@ -58,26 +58,25 @@ export class Service {
 
   public async code2Session(code: string) {
     const { appId, secret } = this.args;
-    const resp = await axios(
-      {
-        method: "get",
-        url: "https://api.weixin.qq.com/sns/jscode2session",
-        timeout,
-        params: {
-          appid: appId,
-          secret,
-          js_code: code,
-          grant_type: "authorization_code",
-        },
-        responseType: "json",
-      });
+    const resp = await axios({
+      method: "get",
+      url: "https://api.weixin.qq.com/sns/jscode2session",
+      timeout,
+      params: {
+        appid: appId,
+        secret,
+        js_code: code,
+        grant_type: "authorization_code",
+      },
+      responseType: "json",
+    });
     return resp.data;
   }
 
   public async getWXACodeUnlimit(
     accessToken: string,
     page: string,
-    scene: string,
+    scene: string
   ) {
     const resp = await axios({
       url: "https://api.weixin.qq.com/wxa/getwxacodeunlimit",
@@ -138,7 +137,7 @@ export class Service {
     accessToken: string,
     img: Buffer,
     imgfile: string,
-    imgtype: string,
+    imgtype: string
   ) {
     const resp = await axios({
       url: "https://api.weixin.qq.com/cgi-bin/media/upload",
@@ -183,16 +182,22 @@ export class Service {
 
   private checkError(name: string, err: Error, body: any) {
     if (err) {
-      return new WechatLiteRequestError(`wechatlite: ${name} request failed, err ${err.message}`);
+      return new WechatLiteRequestError(
+        `wechatlite: ${name} request failed, err ${err.message}`
+      );
     }
     if (body.errcode) {
-      return new WechatLiteBusinessError(`wechatlite: ${name} failed, ${body.errcode}, ${body.errmsg}`, body.errcode, body.errmsg);
+      return new WechatLiteBusinessError(
+        `wechatlite: ${name} failed, ${body.errcode}, ${body.errmsg}`,
+        body.errcode,
+        body.errmsg
+      );
     }
   }
 }
 
-export class WechatLiteRequestError extends Error { }
-export class WechatLiteArgError extends Error { }
+export class WechatLiteRequestError extends Error {}
+export class WechatLiteArgError extends Error {}
 export class WechatLiteBusinessError extends Error {
   public readonly errcode: string;
   public readonly errmsg: string;
@@ -346,4 +351,3 @@ export function sha1(data: string) {
   shasum.update(data);
   return shasum.digest("hex");
 }
-

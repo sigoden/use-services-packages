@@ -4,10 +4,12 @@ import { template } from "lodash";
 export type Service<A> = { [k in keyof A]: ErrorFactory<ExtractService<A[k]>> };
 export type Option<A> = ServiceOption<A, Service<A>>;
 
-type ExtractService<Type> = Type extends ErrorParams<infer K> ? K & CallArgs : CallArgs;
+type ExtractService<Type> = Type extends ErrorParams<infer K>
+  ? K & CallArgs
+  : CallArgs;
 
 export async function init<A extends { [k: string]: ErrorParams<CallArgs> }>(
-  option: InitOption<A, Service<A>>,
+  option: InitOption<A, Service<A>>
 ): Promise<Service<A>> {
   return Object.keys(option.args).reduce((acc, cur) => {
     acc[cur] = new ErrorFactory(cur, option.args[cur]);
@@ -56,7 +58,9 @@ export class ErrorFactory<K extends CallArgs> {
       try {
         return template(params.message)(args);
       } catch (err) {
-        return `cannot complete template<${params.message}> with args<${JSON.stringify(args)}>`;
+        return `cannot complete template<${
+          params.message
+        }> with args<${JSON.stringify(args)}>`;
       }
     };
   }
@@ -70,10 +74,15 @@ export class ErrorFactory<K extends CallArgs> {
   }
 
   public toError(args?: K) {
-    return new HttpError(this.createMessage(args), this.code, this.status, this.extra(args));
+    return new HttpError(
+      this.createMessage(args),
+      this.code,
+      this.status,
+      this.extra(args)
+    );
   }
 
   extra(args: K) {
-    return (args && args.extra) ? args.extra : undefined;
+    return args && args.extra ? args.extra : undefined;
   }
 }

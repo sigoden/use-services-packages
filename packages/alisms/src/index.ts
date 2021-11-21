@@ -15,11 +15,11 @@ export type Templates<A> = {
     signName?: string;
     templateCode: string;
     templateContent?: string;
-  }
+  };
 };
 
 export async function init<A, S extends Service<A>>(
-  option: InitOption<Args<A>, S>,
+  option: InitOption<Args<A>, S>
 ): Promise<S> {
   const srv = new (option.ctor || Service)(option);
   return srv as S;
@@ -36,23 +36,31 @@ export class Service<A> {
   constructor(option: InitOption<Args<A>, Service<A>>) {
     this.args = option.args;
     const { accessKeyId, accessKeySecret } = this.args;
-    this.client = new Client(Object.assign(defaultConfig, { accessKeyId, accessKeySecret }));
+    this.client = new Client(
+      Object.assign(defaultConfig, { accessKeyId, accessKeySecret })
+    );
   }
 
-  public async send<K extends keyof A>(name: K, phonenum: string | string[], data?: A[K]): Promise<SendResult> {
+  public async send<K extends keyof A>(
+    name: K,
+    phonenum: string | string[],
+    data?: A[K]
+  ): Promise<SendResult> {
     const { signName, templateCode } = this.args.templates[name];
     const body = {
-      phoneNumbers: typeof phonenum === "object" ? phonenum.join(",") : phonenum,
+      phoneNumbers:
+        typeof phonenum === "object" ? phonenum.join(",") : phonenum,
       signName: signName || this.args.defaultSignName,
       templateCode: templateCode,
       templateParam: data && JSON.stringify(data),
     };
-    return await this.client.request("SendSms", body,
-      { method: "POST" },
-    );
+    return await this.client.request("SendSms", body, { method: "POST" });
   }
 
-  public async sendBatch<K extends keyof A>(name: K, tasks: {phonenum: string, data?: A[K]}[]): Promise<SendResult> {
+  public async sendBatch<K extends keyof A>(
+    name: K,
+    tasks: { phonenum: string; data?: A[K] }[]
+  ): Promise<SendResult> {
     const { signName, templateCode } = this.args.templates[name];
     const body = {
       phoneNumberJson: [],
@@ -75,7 +83,9 @@ export class Service<A> {
       signNameJson: JSON.stringify(body.signNameJson),
       templateParamJson: JSON.stringify(body.templateParamJson),
     };
-    return await this.client.request("SendBatchSms", postBody, { method: "POST" });
+    return await this.client.request("SendBatchSms", postBody, {
+      method: "POST",
+    });
   }
 }
 
@@ -85,4 +95,3 @@ export interface SendResult {
   BizId: string;
   Code: string;
 }
-

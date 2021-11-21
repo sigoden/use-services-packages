@@ -1,9 +1,29 @@
 {
   "name": "@use-services/alioss",
-  "version": "0.2.0",
+  "version": "1.0.0",
+  "author": "Sigoden Huang <sigoden@gmail.com> (https://sigoden.com/)",
+  "homepage": "https://github.com/sigoden/use-services-packages",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sigoden/use-services-packages.git"
+  },
   "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "jest",
+    "clean": "rimraf dist",
+    "build": "tsc",
+    "prepublishOnly": "npm run -s clean && npm run -s build"
+  },
   "dependencies": {
-    "use-services": "^0.2.8",
+    "use-services": "^1",
     "@types/ali-oss": "^6.16.1",
     "ali-oss": "^6.16.0"
   }

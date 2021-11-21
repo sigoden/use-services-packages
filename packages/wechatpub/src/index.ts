@@ -7,10 +7,10 @@ export const timeout = 2500;
 
 export type Option<S extends Service> = ServiceOption<Args, S>;
 
-export interface Args extends WechatpubArgs { }
+export interface Args extends WechatpubArgs {}
 
 export async function init<S extends Service>(
-  option: InitOption<Args, S>,
+  option: InitOption<Args, S>
 ): Promise<S> {
   const srv = new (option.ctor || Service)(option.args);
   return srv as S;
@@ -50,7 +50,7 @@ export class Service {
     this.args = args;
   }
 
-  public async code2AuthToken(code: string):Promise<AuthAccessToken> {
+  public async code2AuthToken(code: string): Promise<AuthAccessToken> {
     const { appId, secret } = this.args;
     const resp = await axios({
       url: " https://api.weixin.qq.com/sns/oauth2/access_token",
@@ -65,7 +65,10 @@ export class Service {
     return resp.data;
   }
 
-  public async authToken2UserInfo(openId: string, accessToken: string):Promise<UserInfo> {
+  public async authToken2UserInfo(
+    openId: string,
+    accessToken: string
+  ): Promise<UserInfo> {
     const resp = await axios({
       url: "https://api.weixin.qq.com/sns/userinfo",
       timeout,
@@ -92,10 +95,7 @@ export class Service {
     return resp.data;
   }
 
-  public async getUserInfo(
-    accessToken: string,
-    openId: string,
-  ) {
+  public async getUserInfo(accessToken: string, openId: string) {
     const resp = await axios({
       url: "https://api.weixin.qq.com/cgi-bin/user/info",
       timeout,
@@ -110,7 +110,7 @@ export class Service {
   public async createQr(
     accessToken: string,
     sceneStr: string,
-    expires: number,
+    expires: number
   ) {
     const resp = await axios({
       url: "https://api.weixin.qq.com/cgi-bin/qrcode/create",
@@ -376,4 +376,3 @@ export interface JSTicket {
   ticket: string;
   expires_in: number;
 }
-

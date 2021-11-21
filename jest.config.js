@@ -1,8 +1,11 @@
+const esModules = ["p-event", "p-timeout"].join("|");
+
 module.exports = {
   transform: {
-    "^.+\\.tsx?$": "ts-jest",
+    "^.+\\.ts?$": "ts-jest",
+    "^.+\\.js?$": "jest-esm-transformer",
   },
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-  testPathIgnorePatterns: ["/lib/", "/node_modules/"],
-  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
+  testPathIgnorePatterns: ["/node_modules/"],
+  transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
 };

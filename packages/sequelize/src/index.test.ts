@@ -2,7 +2,7 @@ import { Services } from "use-services";
 import * as Sequelize from ".";
 import { Model } from "sequelize";
 
-class User extends Model { }
+class User extends Model {}
 
 const options = {
   sql: {
@@ -11,8 +11,7 @@ const options = {
       database: "",
       password: "",
       username: "",
-      options: {
-      },
+      options: {},
     },
   } as Sequelize.Option<Sequelize.Service>,
 };
@@ -21,4 +20,3 @@ async function run() {
   let srvs: Services<typeof options>;
   srvs.sql.models.User.findAll();
 }
-

@@ -4,8 +4,7 @@ import * as IORedis from ".";
 const options = {
   redis: {
     init: IORedis.init,
-    args: {
-    },
+    args: {},
   } as IORedis.Option<IORedis.Service>,
 };
 
@@ -13,4 +12,3 @@ async function run() {
   let srvs: Services<typeof options>;
   const value = await srvs.redis.get("key");
 }
-

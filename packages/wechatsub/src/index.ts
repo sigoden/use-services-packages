@@ -15,7 +15,7 @@ export interface Args {
 }
 
 export async function init<S extends Service>(
-  option: InitOption<Args, S>,
+  option: InitOption<Args, S>
 ): Promise<S> {
   const srv = new (option.ctor || Service)(option.args);
   return srv as S;
@@ -112,7 +112,11 @@ export class Service {
   private cryptor: any;
   constructor(args: Args) {
     this.args = args;
-    this.cryptor = new WXBizMsgCrypt(this.args.token, this.args.encodingAESKey, this.args.appId);
+    this.cryptor = new WXBizMsgCrypt(
+      this.args.token,
+      this.args.encodingAESKey,
+      this.args.appId
+    );
   }
 
   public toXML = ejs.compile(tpl);
@@ -127,7 +131,11 @@ export class Service {
     return shasum.digest("hex") === signature;
   }
 
-  public reply2CustomerService(fromUsername: string, toUsername: string, kfAccount: string) {
+  public reply2CustomerService(
+    fromUsername: string,
+    toUsername: string,
+    kfAccount: string
+  ) {
     const info = {} as ReplyMsg;
     info.msgType = "transfer_customer_service";
     info.createTime = new Date().getTime();
@@ -141,7 +149,11 @@ export class Service {
   }
 
   public async parse(body: string, query: any): Promise<IncomeMsg> {
-    const parseXmlOptions = { trim: true, rootName: "xml", explicitRoot: false };
+    const parseXmlOptions = {
+      trim: true,
+      rootName: "xml",
+      explicitRoot: false,
+    };
     let xml = await xml2js.parseStringPromise(body, parseXmlOptions);
     xml = this.formatMessage(xml);
     const { msg_signature: signature, timestamp, nonce, encrypt_type } = query;
@@ -149,7 +161,9 @@ export class Service {
       return xml;
     }
     const encryptMessage = xml.Encrypt;
-    if (signature !== this.cryptor.getSignature(timestamp, nonce, encryptMessage)) {
+    if (
+      signature !== this.cryptor.getSignature(timestamp, nonce, encryptMessage)
+    ) {
       throw new WechatBotError("InvalidSignature", "invalid signature");
     }
     const decrypted = this.cryptor.decrypt(encryptMessage);
@@ -157,7 +171,10 @@ export class Service {
     if (messageWrapXml === "") {
       throw new WechatBotError("InvalidAppId", "invalid appId");
     }
-    const wrapXml = await xml2js.parseStringPromise(messageWrapXml, parseXmlOptions);
+    const wrapXml = await xml2js.parseStringPromise(
+      messageWrapXml,
+      parseXmlOptions
+    );
     return this.formatMessage(wrapXml);
   }
 
@@ -166,22 +183,37 @@ export class Service {
     wrap.encrypt = this.cryptor.encrypt(xml);
     wrap.nonce = parseInt((Math.random() * 100000000000).toString(), 10);
     wrap.timestamp = new Date().getTime();
-    wrap.signature = this.cryptor.getSignature(wrap.timestamp, wrap.nonce, wrap.encrypt);
+    wrap.signature = this.cryptor.getSignature(
+      wrap.timestamp,
+      wrap.nonce,
+      wrap.encrypt
+    );
     return this.encryptWrap(wrap);
   }
 
-  public reply(content: ReplyContent, fromUsername: string, toUsername: string, message: IncomeMsg) {
+  public reply(
+    content: ReplyContent,
+    fromUsername: string,
+    toUsername: string,
+    message: IncomeMsg
+  ) {
     const info = {} as ReplyMsg;
     let type = "text";
     let content_ = content as any;
     info.content = content_ || "";
     info.createTime = new Date().getTime();
-    if (message && (message.MsgType === "device_text" || message.MsgType === "device_event")) {
+    if (
+      message &&
+      (message.MsgType === "device_text" || message.MsgType === "device_event")
+    ) {
       info.deviceType = message.DeviceType;
       info.deviceId = message.DeviceID;
       info.sessionId = isNaN(message.SessionID) ? 0 : message.SessionID;
       info.createTime = Math.floor(info.createTime / 1000);
-      if (message.Event === "subscribe_status" || message.Event === "unsubscribe_status") {
+      if (
+        message.Event === "subscribe_status" ||
+        message.Event === "unsubscribe_status"
+      ) {
         delete info.content;
         info.deviceStatus = isNaN(content_) ? 0 : content_;
       } else {
@@ -358,7 +390,15 @@ interface ReplyMsg {
   };
 }
 
-export type ReplyContent = string | ReplyText | ReplyImage | ReplyVoice | ReplyVideo | ReplyMusic | ReplyNews[] | ReplyHardware;
+export type ReplyContent =
+  | string
+  | ReplyText
+  | ReplyImage
+  | ReplyVoice
+  | ReplyVideo
+  | ReplyMusic
+  | ReplyNews[]
+  | ReplyHardware;
 
 export interface ReplyText {
   type: "text";

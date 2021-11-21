@@ -1,4 +1,10 @@
-import { ServiceOption, InitOption, STOP_KEY, eventNames } from "use-services";
+import {
+  ServiceOption,
+  InitOption,
+  INIT_KEY,
+  STOP_KEY,
+  eventNames,
+} from "use-services";
 import * as crypto from "crypto";
 import { difference } from "lodash";
 import pLimit from "p-limit";
@@ -19,10 +25,10 @@ export interface Args<A> {
 export type Deps = [IORedisService];
 
 export async function init<A, S extends Service<A>>(
-  option: InitOption<Args<A>, S>,
+  option: InitOption<Args<A>, S>
 ): Promise<S> {
   const srv = new (option.ctor || Service)(option);
-  option.emitter.on(eventNames.initAll, () => srv.__init__());
+  option.emitter.on(eventNames.initAll, () => srv[INIT_KEY]());
   return srv as S;
 }
 
@@ -86,17 +92,23 @@ export class Service<A> {
     }
     this.ns = option.app + ":" + option.srvName;
     this.redis = option.deps[0];
-    this.args = Object.assign({
-      pollInterval: 1000,
-      ns: "delayqueue",
-    }, option.args);
+    this.args = Object.assign(
+      {
+        pollInterval: 1000,
+        ns: "delayqueue",
+      },
+      option.args
+    );
     for (const key in this.args.producers) {
-      this.args.producers[key] = Object.assign({ autoAck: true }, this.args.producers[key]);
+      this.args.producers[key] = Object.assign(
+        { autoAck: true },
+        this.args.producers[key]
+      );
     }
     this._check();
   }
 
-  public async __init__() {
+  public async [INIT_KEY]() {
     if (this.initialized) {
       return;
     }
@@ -123,7 +135,9 @@ export class Service<A> {
     const noHandlerNames = difference(producerNames, handlerNames);
 
     if (noHandlerNames.length > 0) {
-      throw new DelayQueueError(`delayqueue: need handlers ${noHandlerNames.join(",")}`);
+      throw new DelayQueueError(
+        `delayqueue: need handlers ${noHandlerNames.join(",")}`
+      );
     }
   }
 
@@ -132,7 +146,12 @@ export class Service<A> {
    * @param timeMs - 早于这个时间的为死信,毫秒
    */
   public async getPendings(timeMs: number): Promise<PendingTask[]> {
-    const values: string[] = await this.redis.zrangebyscore(this.pendingIdsKey, "-inf", timeMs, "WITHSCORES");
+    const values: string[] = await this.redis.zrangebyscore(
+      this.pendingIdsKey,
+      "-inf",
+      timeMs,
+      "WITHSCORES"
+    );
     const result = [];
     for (let i = 0; i < values.length; i += 2) {
       const key = values[i];
@@ -144,10 +163,17 @@ export class Service<A> {
   }
 
   public async removePending(key: string) {
-    await this.redis.multi().zrem(this.pendingIdsKey, key).del(this.pendingKey(key)).exec();
+    await this.redis
+      .multi()
+      .zrem(this.pendingIdsKey, key)
+      .del(this.pendingKey(key))
+      .exec();
   }
 
-  public async reclaimPending(key: string, delaySeconds: number): Promise<boolean> {
+  public async reclaimPending(
+    key: string,
+    delaySeconds: number
+  ): Promise<boolean> {
     const { id, name } = this.parseKey(key);
     const dataRaw = await this.redis.get(this.pendingKey(key));
     if (!dataRaw) {
@@ -170,7 +196,12 @@ export class Service<A> {
    * @param delaySeconds - 延时秒
    * @param data - 数据
    */
-  public async publish<K extends keyof A>(name: K, delaySeconds: number, data: A[K], id?: string) {
+  public async publish<K extends keyof A>(
+    name: K,
+    delaySeconds: number,
+    data: A[K],
+    id?: string
+  ) {
     const publishAt = Date.now();
 
     const scheduleAt = publishAt + delaySeconds * 1000;
@@ -192,11 +223,7 @@ export class Service<A> {
    */
   public async unpublish(name: keyof A, id: string): Promise<void> {
     const key = this.key(name, id);
-    await this.redis
-      .multi()
-      .zrem(this.idsKey, key)
-      .del(key)
-      .exec();
+    await this.redis.multi().zrem(this.idsKey, key).del(key).exec();
   }
 
   /**
@@ -226,11 +253,7 @@ export class Service<A> {
   }
 
   private async _runInterval() {
-    const {
-      pollInterval,
-      producers,
-      handlers,
-    } = this.args;
+    const { pollInterval, producers, handlers } = this.args;
     if (this.timer) clearTimeout(this.timer);
     this.timer = setTimeout(() => {
       this._runInterval();
@@ -240,7 +263,7 @@ export class Service<A> {
       this.idsKey,
       "-inf",
       Date.now(),
-      "WITHSCORES",
+      "WITHSCORES"
     );
     if (queueValues.length === 0) {
       return;
@@ -267,42 +290,55 @@ export class Service<A> {
         const scheduleAt: string = queueValues[i + 1];
         const handler = handlers[name];
         const task = await redis.eval(
-          getTaskScript, 
-          5, 
+          getTaskScript,
+          5,
           this.idsKey,
-          this.pendingIdsKey, 
+          this.pendingIdsKey,
           key,
           this.lockedKey(key),
           this.pendingKey(key),
-          this.args.pollInterval * 1.1,
+          this.args.pollInterval * 1.1
         );
         if (task) {
           const { data = null, publishAt = -1 } = JSON.parse(task);
           let isAcked = false;
           const ack = () => {
             if (!isAcked) {
-              this.redis.multi().zrem(this.pendingIdsKey, key).del(this.pendingKey(key)).exec();
+              this.redis
+                .multi()
+                .zrem(this.pendingIdsKey, key)
+                .del(this.pendingKey(key))
+                .exec();
               isAcked = true;
             }
           };
-          const handleCtx = { name, scheduleAt: parseInt(scheduleAt), data, publishAt, id, ack };
+          const handleCtx = {
+            name,
+            scheduleAt: parseInt(scheduleAt),
+            data,
+            publishAt,
+            id,
+            ack,
+          };
           try {
             await handler(handleCtx);
-          } catch (err) { }
+          } catch (err) {}
           if (producer.autoAck) ack();
         }
       };
       tasks.push(task);
     }
-    Promise.all(Array.from(taskMap.keys()).map(async name => {
-      const tasks = taskMap.get(name);
-      if (producers[name].pLimit) {
-        const limit = pLimit(producers[name].pLimit);
-        await Promise.all(tasks.map(task => limit(() => task())));
-      } else {
-        await Promise.all(tasks.map(task => task()));
-      }
-    }));
+    Promise.all(
+      Array.from(taskMap.keys()).map(async (name) => {
+        const tasks = taskMap.get(name);
+        if (producers[name].pLimit) {
+          const limit = pLimit(producers[name].pLimit);
+          await Promise.all(tasks.map((task) => limit(() => task())));
+        } else {
+          await Promise.all(tasks.map((task) => task()));
+        }
+      })
+    );
   }
 
   private _redisKey(...args: string[]) {
@@ -349,4 +385,3 @@ export class DelayQueueError extends Error {
     this.name = "DelayQueueError";
   }
 }
-

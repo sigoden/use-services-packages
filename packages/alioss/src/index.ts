@@ -18,7 +18,7 @@ export interface Args {
 }
 
 export async function init<S extends Service>(
-  option: InitOption<Args, S>,
+  option: InitOption<Args, S>
 ): Promise<S> {
   const srv = new (option.ctor || Service)(option);
   return srv as S;
@@ -58,7 +58,12 @@ export class Service {
 
   public async getStsData(sessionName?: string) {
     const { arn, policy, expiration = 15 * 60, session } = this.args.sts;
-    const { credentials } = await this.sts.assumeRole(arn, policy, expiration, sessionName || session);
+    const { credentials } = await this.sts.assumeRole(
+      arn,
+      policy,
+      expiration,
+      sessionName || session
+    );
     return <STSData>{
       region: this.args.oss.region,
       bucket: this.args.oss.bucket,

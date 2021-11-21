@@ -4,7 +4,7 @@ import { Service as IORedisService } from "@use-services/ioredis";
 export type Option<A, S extends Service<A>> = ServiceOption<A, S>;
 
 export async function init<A, S extends Service<A>>(
-  option: InitOption<A, S>,
+  option: InitOption<A, S>
 ): Promise<S> {
   const srv = new (option.ctor || Service)(option);
   await srv.load();
@@ -30,7 +30,8 @@ export class Service<A> {
   public async save(change: Partial<A>) {
     const data = { ...this.data, ...change };
     const modifyAt = Date.now();
-    await this.redis.multi()
+    await this.redis
+      .multi()
       .set(this.dateKey, modifyAt)
       .set(this.dataKey, JSON.stringify(data))
       .exec();

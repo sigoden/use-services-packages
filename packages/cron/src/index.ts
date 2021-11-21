@@ -1,4 +1,10 @@
-import { ServiceOption, InitOption, STOP_KEY, eventNames } from "use-services";
+import {
+  ServiceOption,
+  InitOption,
+  INIT_KEY,
+  STOP_KEY,
+  eventNames,
+} from "use-services";
 import cronParser from "cron-parser";
 import { Service as IORedisService } from "@use-services/ioredis";
 
@@ -6,17 +12,17 @@ export type Option<A, S extends Service<A>> = ServiceOption<Args<A>, S>;
 
 export interface Args<A> {
   pollInterval?: number; // 轮询redis间隔,单位豪秒
-  crons: {[k in keyof A]: string};
+  crons: { [k in keyof A]: string };
   handlers: A;
 }
 
 export type Deps = [IORedisService];
 
 export async function init<A, S extends Service<A>>(
-  option: InitOption<Args<A>, S>,
+  option: InitOption<Args<A>, S>
 ): Promise<S> {
   const srv = new (option.ctor || Service)(option);
-  option.emitter.on(eventNames.initAll, () => srv.__init__());
+  option.emitter.on(eventNames.initAll, () => srv[INIT_KEY]());
   return srv as S;
 }
 
@@ -27,7 +33,6 @@ const lockScript = `
   redis.call("set", KEYS[1], ARGV[1], "PX", ARGV[2])
   return 1
 `;
-
 
 export type Context = {
   name: string;
@@ -49,13 +54,16 @@ export class Service<A> {
     }
     this.ns = option.app + ":" + option.srvName;
     this.redis = option.deps[0];
-    this.args = Object.assign({
-      pollInterval: 500,
-    }, option.args);
+    this.args = Object.assign(
+      {
+        pollInterval: 500,
+      },
+      option.args
+    );
     this._checkHandlers();
   }
 
-  public async __init__() {
+  public async [INIT_KEY]() {
     if (this.initialized) {
       return;
     }
@@ -73,7 +81,7 @@ export class Service<A> {
     if (this.lastLock) {
       timeoutMs = this.args.pollInterval + 50;
     } else {
-      timeoutMs = this.args.pollInterval  + 100 * (Math.random() - 0.5);
+      timeoutMs = this.args.pollInterval + 100 * (Math.random() - 0.5);
     }
     if (this.timer) clearTimeout(this.timer);
     this.timer = setTimeout(() => this._runinterval(), timeoutMs);
@@ -84,20 +92,30 @@ export class Service<A> {
     const keyLock = this._redisKey("lock");
 
     // 只有一个进程获得了锁
-    const result = await this.redis.eval(lockScript, 1, keyLock, "", this.args.pollInterval * 1.1);
+    const result = await this.redis.eval(
+      lockScript,
+      1,
+      keyLock,
+      "",
+      this.args.pollInterval * 1.1
+    );
     if (result === 0) return;
     this.lastLock = true;
 
     const now = Date.now();
     const sec = Math.floor(Date.now() / 1000);
     const keyLastRunAts = this._redisKey("lastRunAts");
-    const lastRunAtsRaw = await this.redis.get(keyLastRunAts) || "{}";
+    const lastRunAtsRaw = (await this.redis.get(keyLastRunAts)) || "{}";
     const lastRunAts = JSON.parse(lastRunAtsRaw);
-    Object.keys(this.args.crons).forEach(name => lastRunAts[name] || (lastRunAts[name] = "" + sec));
+    Object.keys(this.args.crons).forEach(
+      (name) => lastRunAts[name] || (lastRunAts[name] = "" + sec)
+    );
     const schedules = await this._getSchedules(now, lastRunAts);
-    schedules.map(async ctx => {
+    schedules.map(async (ctx) => {
       if (ctx.runAts.length > 0) {
-        lastRunAts[ctx.name] = Math.floor(ctx.runAts[ctx.runAts.length - 1].getTime() / 1000);
+        lastRunAts[ctx.name] = Math.floor(
+          ctx.runAts[ctx.runAts.length - 1].getTime() / 1000
+        );
         const handler = this.args.handlers[ctx.name];
         if (handler) await handler(ctx);
       }
@@ -109,12 +127,17 @@ export class Service<A> {
     return this.ns + ":" + args.join(":");
   }
 
-  private async _getSchedules(now: number, lastRunAts: { [k: string]: string }): Promise<Context[]> {
+  private async _getSchedules(
+    now: number,
+    lastRunAts: { [k: string]: string }
+  ): Promise<Context[]> {
     const result = [];
     for (const name in this.args.crons) {
       const cron = this.args.crons[name];
       const currentDate = new Date(parseInt(lastRunAts[name]) * 1000);
-      const interval = cronParser.parseExpression(cron, { currentDate: currentDate });
+      const interval = cronParser.parseExpression(cron, {
+        currentDate: currentDate,
+      });
       const runAts = [];
       while (true) {
         const obj = interval.next();
@@ -131,7 +154,7 @@ export class Service<A> {
   private _checkHandlers() {
     const { crons, handlers } = this.args;
     const misHandlers = [];
-    Object.keys(crons).forEach(key => {
+    Object.keys(crons).forEach((key) => {
       if (!handlers[key]) {
         misHandlers.push(key);
       }

@@ -1,7 +1,7 @@
 import { Services } from "use-services";
 import * as Echo from ".";
 
-const settings =  {
+const settings = {
   k: "v",
 };
 
