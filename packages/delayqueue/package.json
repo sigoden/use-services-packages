@@ -1,6 +1,7 @@
 {
   "name": "delayqueue",
   "version": "1.0.0",
+  "keywords": ["use-services", "delayqueue"],
   "author": "Sigoden Huang <sigoden@gmail.com> (https://sigoden.com/)",
   "homepage": "https://github.com/sigoden/use-services-packages",
   "repository": {
