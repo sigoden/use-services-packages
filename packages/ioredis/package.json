@@ -1,7 +1,10 @@
 {
   "name": "@use-services/ioredis",
-  "version": "1.0.0",
-  "keywords": ["use-services", "redis"],
+  "version": "1.1.0",
+  "keywords": [
+    "use-services",
+    "redis"
+  ],
   "author": "Sigoden Huang <sigoden@gmail.com> (https://sigoden.com/)",
   "homepage": "https://github.com/sigoden/use-services-packages",
   "repository": {
@@ -25,6 +28,6 @@
   },
   "dependencies": {
     "@types/ioredis": "^4.27.1",
-    "use-services": "^1"
+    "use-services": "^1.2.0"
   }
 }

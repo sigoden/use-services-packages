@@ -1,7 +1,11 @@
 {
   "name": "@use-services/sequelize",
-  "version": "1.0.0",
-  "keywords": ["use-services", "sequelize", "database"],
+  "version": "1.1.0",
+  "keywords": [
+    "use-services",
+    "sequelize",
+    "database"
+  ],
   "author": "Sigoden Huang <sigoden@gmail.com> (https://sigoden.com/)",
   "homepage": "https://github.com/sigoden/use-services-packages",
   "repository": {
@@ -25,6 +29,6 @@
   },
   "dependencies": {
     "sequelize": "^6.6.5",
-    "use-services": "^1"
+    "use-services": "^1.2.0"
   }
 }

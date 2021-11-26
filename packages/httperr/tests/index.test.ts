@@ -1,5 +1,5 @@
-import { Services } from "use-services";
-import * as HttpErr from ".";
+import useServices from "use-services";
+import * as HttpErr from "../src";
 
 const errors = {
   ErrBad: {
@@ -22,7 +22,10 @@ const options = {
   } as HttpErr.Option<typeof errors>,
 };
 
-async function run() {
-  let srvs: Services<typeof options>;
-  srvs.errs.ErrBadArg.toError({ message: "bad arguments" });
-}
+test("it works", async () => {
+  const { srvs, init } = useServices("test", options);
+  await init();
+  expect(srvs.errs.ErrBadArg.toError({ message: "bad arguments" }).name).toBe(
+    "ErrBadArg"
+  );
+});

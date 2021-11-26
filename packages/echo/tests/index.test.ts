@@ -1,5 +1,5 @@
-import { Services } from "use-services";
-import * as Echo from ".";
+import useServices from "use-services";
+import * as Echo from "../src/";
 
 const settings = {
   k: "v",
@@ -12,7 +12,8 @@ const options = {
   } as Echo.Option<typeof settings>,
 };
 
-async function run() {
-  let srvs: Services<typeof options>;
-  srvs.settings.k;
-}
+test("it works", async () => {
+  const { srvs, init } = useServices("test", options);
+  await init();
+  expect(srvs.settings.k).toEqual("v");
+});

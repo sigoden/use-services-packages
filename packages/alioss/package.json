@@ -1,7 +1,10 @@
 {
   "name": "@use-services/alioss",
-  "version": "1.0.0",
-  "keywords": ["use-services", "alioss"],
+  "version": "1.1.0",
+  "keywords": [
+    "use-services",
+    "alioss"
+  ],
   "author": "Sigoden Huang <sigoden@gmail.com> (https://sigoden.com/)",
   "homepage": "https://github.com/sigoden/use-services-packages",
   "repository": {
@@ -24,8 +27,8 @@
     "prepublishOnly": "npm run -s clean && npm run -s build"
   },
   "dependencies": {
-    "use-services": "^1",
     "@types/ali-oss": "^6.16.1",
-    "ali-oss": "^6.16.0"
+    "ali-oss": "^6.16.0",
+    "use-services": "^1.2.0"
   }
 }

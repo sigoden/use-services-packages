@@ -1,5 +1,5 @@
-import { Services } from "use-services";
-import * as IORedis from ".";
+import useServices from "use-services";
+import * as IORedis from "../src/";
 
 const options = {
   redis: {
@@ -8,7 +8,9 @@ const options = {
   } as IORedis.Option<IORedis.Service>,
 };
 
-async function run() {
-  let srvs: Services<typeof options>;
-  const value = await srvs.redis.get("key");
-}
+test("it works", async () => {
+  const { srvs, init } = useServices("test", options);
+  await init();
+  await srvs.redis.set("key", "foo");
+  expect(await srvs.redis.get("key")).toEqual("foo");
+});

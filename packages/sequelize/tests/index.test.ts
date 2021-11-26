@@ -1,8 +1,5 @@
-import { Services } from "use-services";
-import * as Sequelize from ".";
-import { Model } from "sequelize";
-
-class User extends Model {}
+import useServices from "use-services";
+import * as Sequelize from "../src";
 
 const options = {
   sql: {
@@ -16,7 +13,8 @@ const options = {
   } as Sequelize.Option<Sequelize.Service>,
 };
 
-async function run() {
-  let srvs: Services<typeof options>;
-  srvs.sql.models.User.findAll();
-}
+test("it works", async () => {
+  const { srvs, init } = useServices("test", options);
+  await init();
+  expect(srvs.sql).toBeTruthy();
+});

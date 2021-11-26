@@ -34,114 +34,114 @@ importers:
     specifiers:
       '@types/ali-oss': ^6.16.1
       ali-oss: ^6.16.0
-      use-services: ^1
+      use-services: ^1.2.0
     dependencies:
       '@types/ali-oss': 6.16.2
       ali-oss: 6.16.0
-      use-services: 1.1.0
+      use-services: 1.2.0
 
   packages/alisms:
     specifiers:
       '@alicloud/pop-core': ^1.7.10
-      use-services: ^1
+      use-services: ^1.2.0
     dependencies:
       '@alicloud/pop-core': 1.7.10
-      use-services: 1.1.0
+      use-services: 1.2.0
 
   packages/cron:
     specifiers:
       '@use-services/ioredis': workspace:^
       cron-parser: ^3.5.0
-      use-services: ^1
+      use-services: ^1.2.0
     dependencies:
       '@use-services/ioredis': link:../ioredis
       cron-parser: 3.5.0
-      use-services: 1.1.0
+      use-services: 1.2.0
 
   packages/delayqueue:
     specifiers:
       '@use-services/ioredis': workspace:^
       lodash: ^4.17.21
       p-limit: ^4.0.0
-      use-services: ^1
+      use-services: ^1.2.0
     dependencies:
       '@use-services/ioredis': link:../ioredis
       lodash: 4.17.21
       p-limit: 4.0.0
-      use-services: 1.1.0
+      use-services: 1.2.0
 
   packages/dynconf:
     specifiers:
       '@use-services/ioredis': workspace:^
-      use-services: ^1
+      use-services: ^1.2.0
     dependencies:
       '@use-services/ioredis': link:../ioredis
-      use-services: 1.1.0
+      use-services: 1.2.0
 
   packages/echo:
     specifiers:
-      use-services: ^1
+      use-services: ^1.2.0
     dependencies:
-      use-services: 1.1.0
+      use-services: 1.2.0
 
   packages/httperr:
     specifiers:
       lodash: ^4.17.21
-      use-services: ^1
+      use-services: ^1.2.0
     dependencies:
       lodash: 4.17.21
-      use-services: 1.1.0
+      use-services: 1.2.0
 
   packages/ioredis:
     specifiers:
       '@types/ioredis': ^4.27.1
-      use-services: ^1
+      use-services: ^1.2.0
     dependencies:
       '@types/ioredis': 4.28.1
-      use-services: 1.1.0
+      use-services: 1.2.0
 
   packages/sequelize:
     specifiers:
       sequelize: ^6.6.5
-      use-services: ^1
+      use-services: ^1.2.0
     dependencies:
       sequelize: 6.11.0
-      use-services: 1.1.0
+      use-services: 1.2.0
 
   packages/wechatlite:
     specifiers:
       axios: ^0.21.1
-      use-services: ^1
+      use-services: ^1.2.0
     dependencies:
       axios: 0.21.4
-      use-services: 1.1.0
+      use-services: 1.2.0
 
   packages/wechatpub:
     specifiers:
       axios: ^0.21.1
-      use-services: ^1
+      use-services: ^1.2.0
     dependencies:
       axios: 0.21.4
-      use-services: 1.1.0
+      use-services: 1.2.0
 
   packages/wechatsub:
     specifiers:
       ejs: ^3.1.6
-      use-services: ^1
+      use-services: ^1.2.0
       wechat-crypto: ^0.0.2
       xml2js: ^0.4.23
     dependencies:
       ejs: 3.1.6
-      use-services: 1.1.0
+      use-services: 1.2.0
       wechat-crypto: 0.0.2
       xml2js: 0.4.23
 
   packages/winston:
     specifiers:
-      use-services: ^1
+      use-services: ^1.2.0
       winston: ^3.3.3
     dependencies:
-      use-services: 1.1.0
+      use-services: 1.2.0
       winston: 3.3.3
 
 packages:
@@ -3383,11 +3383,16 @@ packages:
       minimist: 1.2.5
     dev: false
 
-  /p-event/5.0.1:
-    resolution: {integrity: sha512-dd589iCQ7m1L0bmC5NLlVYfy3TbBEsMUfWx9PyAgPeIcFZ/E2yaTZ4Rz4MiBmmJShviiftHVXOqfnfzJ6kyMrQ==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+  /p-event/4.2.0:
+    resolution: {integrity: sha512-KXatOjCRXXkSePPb1Nbi0p0m+gQAwdlbhi4wQKJPI1HsMQS9g+Sqp2o+QHziPr7eYJyOZet836KoHEVM1mwOrQ==}
+    engines: {node: '>=8'}
     dependencies:
-      p-timeout: 5.0.2
+      p-timeout: 3.2.0
+    dev: false
+
+  /p-finally/1.0.0:
+    resolution: {integrity: sha1-P7z7FbiZpEEjs0ttzBi3JDNqLK4=}
+    engines: {node: '>=4'}
     dev: false
 
   /p-limit/2.3.0:
@@ -3411,9 +3416,11 @@ packages:
       p-limit: 2.3.0
     dev: true
 
-  /p-timeout/5.0.2:
-    resolution: {integrity: sha512-sEmji9Yaq+Tw+STwsGAE56hf7gMy9p0tQfJojIAamB7WHJYJKf1qlsg9jqBWG8q9VCxKPhZaP/AcXwEoBcYQhQ==}
-    engines: {node: '>=12'}
+  /p-timeout/3.2.0:
+    resolution: {integrity: sha512-rhIwUycgwwKcP9yTOOFK/AKsAopjjCakVqLHePO3CC6Mir1Z99xT+R63jZxAT5lFZLa2inS5h+ZS2GvR99/FBg==}
+    engines: {node: '>=8'}
+    dependencies:
+      p-finally: 1.0.0
     dev: false
 
   /p-try/2.2.0:
@@ -4262,11 +4269,11 @@ packages:
       - supports-color
     dev: false
 
-  /use-services/1.1.0:
-    resolution: {integrity: sha512-G3kgLmCKYWSEMWKaaU5unygSxdsfzLlZc0bJRKOnMg2neW39PoAEz4LgNips9HkKFSTmyN2/kgfhBopBqCV3iQ==}
+  /use-services/1.2.0:
+    resolution: {integrity: sha512-QYmzjzm/i/ISZwwvL86gs+B6O50iEeVR2PzD01513qoPNfN7ux8BR9XGTLh2uesr/Is8IUg8tqekdL9X/RxvOw==}
     dependencies:
       debug: 4.3.2
-      p-event: 5.0.1
+      p-event: 4.2.0
     transitivePeerDependencies:
       - supports-color
     dev: false
