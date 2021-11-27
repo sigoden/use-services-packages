@@ -4,7 +4,9 @@ import * as Winston from "../src/";
 const options = {
   logger: {
     init: Winston.init,
-    args: {},
+    args: {
+      format: ["simple"],
+    },
   } as Winston.Option<Winston.Service>,
 };
 

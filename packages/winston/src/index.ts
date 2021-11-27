@@ -1,14 +1,16 @@
 import * as winston from "winston";
 import { ServiceOption, InitOption } from "use-services";
-const { combine, json, timestamp } = winston.format;
+const { combine } = winston.format;
 
 export interface Args {
   console?: winston.transports.ConsoleTransportOptions;
   file?: winston.transports.FileTransportOptions;
   http?: winston.transports.HttpTransportOptions;
-  formatErrors?: { ErrType: typeof Error; format: (e: Error) => any }[];
   level?: string;
-  format?: winston.Logform.Format;
+  meta?: Record<string, any>;
+  format?: Array<string | [string, ...any[]]>;
+  serializeErrors?: { ErrType: typeof Error; serialize: (e: Error) => any }[];
+  extraFormats?: Record<string, winston.Logform.FormatWrap>;
 }
 
 export type Option<S extends Service> = ServiceOption<Args, S>;
@@ -26,10 +28,17 @@ export class Service {
   constructor(option: InitOption<Args, Service>) {
     const args = (this.args = option.args);
     this.loggers = [];
-    this.args.formatErrors = this.args.formatErrors || [];
-    const level = this.args.level || "info";
-    const format = this.args.format || combine(timestamp(), json());
-    const defaultMeta = { service: option.app };
+    this.args.serializeErrors = this.args.serializeErrors || [];
+    const loggerOpts: winston.LoggerOptions = {
+      level: this.args.level || "info",
+      format: parseFormat(
+        this.args.format || ["timestamp", "json"],
+        this.args.extraFormats || {}
+      ),
+    };
+    if (this.args.meta) {
+      loggerOpts.defaultMeta = this.args.meta;
+    }
     const transports = [];
     const consoleOptions = args.console || { level: "info" };
     if (consoleOptions) {
@@ -41,14 +50,8 @@ export class Service {
     if (args.file) {
       transports.push(new winston.transports.File(args.file));
     }
-    this.loggers.push(
-      winston.createLogger({
-        defaultMeta,
-        format,
-        level,
-        transports,
-      })
-    );
+    loggerOpts.transports = transports;
+    this.loggers.push(winston.createLogger(loggerOpts));
   }
   public log(
     kind: "info" | "debug" | "warn" | "error",
@@ -73,9 +76,9 @@ export class Service {
 
   private wrapMessage(message: Error | string) {
     if (message instanceof Error) {
-      for (const f of this.args.formatErrors) {
-        if (message instanceof f.ErrType) {
-          return f.format(message);
+      for (const serErr of this.args.serializeErrors) {
+        if (message instanceof serErr.ErrType) {
+          return serErr.serialize(message);
         }
       }
       return {
@@ -94,4 +97,24 @@ export class Service {
 
 function isPlainObject(obj: any) {
   return Object.prototype.toString.call(obj) === "[object Object]";
+}
+
+function parseFormat(
+  format: Array<string | [string, ...any[]]>,
+  extraFormats: Record<string, winston.Logform.FormatWrap>
+) {
+  try {
+    const formatParts = [];
+    for (const fm of format) {
+      if (typeof fm === "string") {
+        formatParts.push((extraFormats[fm] || winston.format[fm])());
+      } else if (Array.isArray(fm)) {
+        const [name, ...args] = fm;
+        formatParts.push((extraFormats[name] || winston.format[name])(...args));
+      }
+    }
+    return combine(...formatParts);
+  } catch {
+    throw new Error(`Invalid format '${JSON.stringify(format)}'`);
+  }
 }
