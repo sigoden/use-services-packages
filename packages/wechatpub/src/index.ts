@@ -1,57 +1,27 @@
 /* eslint-disable camelcase */
-import { ServiceOption, InitOption } from "use-services";
+import { ServiceOption, InitOption, createInitFn } from "use-services";
 import axios from "axios";
 import * as crypto from "crypto";
 
-export const timeout = 2500;
-
 export type Option<S extends Service> = ServiceOption<Args, S>;
 
-export interface Args extends WechatpubArgs {}
-
-export async function init<S extends Service>(
-  option: InitOption<Args, S>
-): Promise<S> {
-  const srv = new (option.ctor || Service)(option.args);
-  return srv as S;
-}
-
-export interface WechatpubArgs {
+export interface Args {
   appId: string;
   secret: string;
   token?: string;
+  timeout?: number;
   encodingAESKey?: string;
-}
-
-export function sha1(data: string) {
-  const shasum = crypto.createHash("sha1");
-  shasum.update(data);
-  return shasum.digest("hex");
-}
-
-export function nonceStr(length = 32): string {
-  const chars =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  const len = chars.length;
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * len));
-  }
-  return result;
-}
-
-export function currentSeconds() {
-  return Math.ceil(Date.now() / 1000);
 }
 
 export class Service {
   public readonly args: Args;
-  constructor(args: Args) {
-    this.args = args;
+  constructor(option: InitOption<Args, Service>) {
+    this.args = option.args;
+    this.args.timeout = this.args.timeout || 2500;
   }
 
   public async code2AuthToken(code: string): Promise<AuthAccessToken> {
-    const { appId, secret } = this.args;
+    const { appId, secret, timeout } = this.args;
     const resp = await axios({
       url: " https://api.weixin.qq.com/sns/oauth2/access_token",
       timeout,
@@ -71,7 +41,7 @@ export class Service {
   ): Promise<UserInfo> {
     const resp = await axios({
       url: "https://api.weixin.qq.com/sns/userinfo",
-      timeout,
+      timeout: this.args.timeout,
       params: {
         openid: openId,
         access_token: accessToken,
@@ -82,7 +52,7 @@ export class Service {
   }
 
   public async getAccessToken() {
-    const { appId, secret } = this.args;
+    const { appId, secret, timeout } = this.args;
     const resp = await axios({
       url: "https://api.weixin.qq.com/cgi-bin/token",
       timeout,
@@ -98,7 +68,7 @@ export class Service {
   public async getUserInfo(accessToken: string, openId: string) {
     const resp = await axios({
       url: "https://api.weixin.qq.com/cgi-bin/user/info",
-      timeout,
+      timeout: this.args.timeout,
       params: {
         access_token: accessToken,
         openid: openId,
@@ -115,7 +85,7 @@ export class Service {
     const resp = await axios({
       url: "https://api.weixin.qq.com/cgi-bin/qrcode/create",
       method: "post",
-      timeout,
+      timeout: this.args.timeout,
       params: {
         access_token: accessToken,
       },
@@ -135,7 +105,7 @@ export class Service {
   public async showQr(ticket: string) {
     const resp = await axios({
       url: "https://mp.weixin.qq.com/cgi-bin/showqrcode",
-      timeout,
+      timeout: this.args.timeout,
       params: {
         ticket,
       },
@@ -147,7 +117,7 @@ export class Service {
     const resp = await axios({
       url: "https://api.weixin.qq.com/cgi-bin/message/custom/send",
       method: "post",
-      timeout,
+      timeout: this.args.timeout,
       params: {
         access_token: accessToken,
       },
@@ -160,7 +130,7 @@ export class Service {
     const resp = await axios({
       url: "https://api.weixin.qq.com/cgi-bin/message/template/send",
       method: "post",
-      timeout,
+      timeout: this.args.timeout,
       params: {
         access_token: accessToken,
       },
@@ -181,7 +151,7 @@ export class Service {
   public async getJSTicket(accessToken: string) {
     const resp = await axios({
       url: "https://api.weixin.qq.com/cgi-bin/ticket/getticket",
-      timeout,
+      timeout: this.args.timeout,
       params: {
         access_token: accessToken,
         type: "jsapi",
@@ -199,6 +169,8 @@ export class Service {
     }
   }
 }
+
+export const init = createInitFn(Service);
 
 export interface ErrorData {
   errcode: string;
@@ -375,4 +347,25 @@ export interface TemplateMessage {
 export interface JSTicket {
   ticket: string;
   expires_in: number;
+}
+
+export function sha1(data: string) {
+  const shasum = crypto.createHash("sha1");
+  shasum.update(data);
+  return shasum.digest("hex");
+}
+
+export function nonceStr(length = 32): string {
+  const chars =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const len = chars.length;
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * len));
+  }
+  return result;
+}
+
+export function currentSeconds() {
+  return Math.ceil(Date.now() / 1000);
 }

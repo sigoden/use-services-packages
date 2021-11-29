@@ -1,9 +1,8 @@
 import {
   ServiceOption,
   InitOption,
-  INIT_KEY,
   STOP_KEY,
-  eventNames,
+  SERVICES_EVENTS,
 } from "use-services";
 import * as crypto from "crypto";
 import { difference } from "lodash";
@@ -23,14 +22,6 @@ export interface Args<A> {
 }
 
 export type Deps = [IORedisService];
-
-export async function init<A, S extends Service<A>>(
-  option: InitOption<Args<A>, S>
-): Promise<S> {
-  const srv = new (option.ctor || Service)(option);
-  option.emitter.on(eventNames.initAll, () => srv[INIT_KEY]());
-  return srv as S;
-}
 
 const KEY_SEP = "@@@";
 
@@ -56,29 +47,6 @@ redis.call("ZREM", KEYS[1], KEYS[3])
 redis.call("RENAME", KEYS[3], KEYS[5])
 return redis.call("GET", KEYS[5])
 `;
-
-export interface Context<T> {
-  name: string;
-  publishAt: number;
-  scheduleAt: number;
-  id: string;
-  data: T;
-  ack: () => void;
-}
-
-export interface PendingTask {
-  id: string;
-  name: string;
-  deadAt: number;
-  key: string;
-}
-
-export type HandlerFn<T> = (ctx: Context<T>) => Promise<void>;
-
-export interface ProducerOptions {
-  pLimit?: number;
-  autoAck?: boolean;
-}
 
 export class Service<A> {
   private args: Args<A>;
@@ -108,7 +76,7 @@ export class Service<A> {
     this._check();
   }
 
-  public async [INIT_KEY]() {
+  public async start() {
     if (this.initialized) {
       return;
     }
@@ -346,6 +314,14 @@ export class Service<A> {
   }
 }
 
+export async function init<A, S extends Service<A>>(
+  option: InitOption<Args<A>, S>
+): Promise<S> {
+  const srv = new (option.ctor || Service)(option);
+  option.emitter.on(SERVICES_EVENTS.INIT_END, () => srv.start());
+  return srv as S;
+}
+
 export class DeeQueueNoHandlerError extends Error {
   public readonly ctx: Context<any>;
   constructor(ctx: Context<any>) {
@@ -384,4 +360,27 @@ export class DelayQueueError extends Error {
     super(msg);
     this.name = "DelayQueueError";
   }
+}
+
+export interface Context<T> {
+  name: string;
+  publishAt: number;
+  scheduleAt: number;
+  id: string;
+  data: T;
+  ack: () => void;
+}
+
+export interface PendingTask {
+  id: string;
+  name: string;
+  deadAt: number;
+  key: string;
+}
+
+export type HandlerFn<T> = (ctx: Context<T>) => Promise<void>;
+
+export interface ProducerOptions {
+  pLimit?: number;
+  autoAck?: boolean;
 }

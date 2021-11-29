@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { ServiceOption, InitOption } from "use-services";
+import { ServiceOption, createInitFn, InitOption } from "use-services";
 
 import * as crypto from "crypto";
 import * as xml2js from "xml2js";
@@ -12,13 +12,6 @@ export interface Args {
   token: string;
   appId: string;
   encodingAESKey: string;
-}
-
-export async function init<S extends Service>(
-  option: InitOption<Args, S>
-): Promise<S> {
-  const srv = new (option.ctor || Service)(option.args);
-  return srv as S;
 }
 
 const tpl = `<xml>
@@ -110,8 +103,8 @@ const wrapTpl = `<xml>
 export class Service {
   public readonly args: Args;
   private cryptor: any;
-  constructor(args: Args) {
-    this.args = args;
+  constructor(option: InitOption<Args, Service>) {
+    this.args = option.args;
     this.cryptor = new WXBizMsgCrypt(
       this.args.token,
       this.args.encodingAESKey,
@@ -274,6 +267,8 @@ export class Service {
     }
   }
 }
+
+export const init = createInitFn(Service);
 
 export interface IncomeMsgBase {
   MsgType: string;

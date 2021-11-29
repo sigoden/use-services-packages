@@ -1,31 +1,23 @@
 /* eslint-disable camelcase */
-import { ServiceOption, InitOption } from "use-services";
+import { ServiceOption, createInitFn, InitOption } from "use-services";
 import * as crypto from "crypto";
 import axios from "axios";
 
-export const timeout = 2500;
 export type Option<S extends Service> = ServiceOption<Args, S>;
 
-export interface Args extends WechatLiteArgs {}
-
-export async function init<S extends Service>(
-  option: InitOption<Args, S>
-): Promise<S> {
-  const srv = new (option.ctor || Service)(option.args);
-  return srv as S;
-}
-
-export interface WechatLiteArgs {
+export interface Args {
   appId: string;
   secret: string;
   token?: string;
   encodingAESKey?: string;
+  timeout?: number;
 }
 
 export class Service {
-  public args: WechatLiteArgs;
-  constructor(args: WechatLiteArgs) {
-    this.args = args;
+  public args: Args;
+  constructor(option: InitOption<Args, Service>) {
+    this.args = option.args;
+    this.args.timeout = this.args.timeout || 2500;
   }
 
   public wxBizDataDecrypt(
@@ -57,7 +49,7 @@ export class Service {
   }
 
   public async code2Session(code: string) {
-    const { appId, secret } = this.args;
+    const { appId, secret, timeout } = this.args;
     const resp = await axios({
       method: "get",
       url: "https://api.weixin.qq.com/sns/jscode2session",
@@ -81,7 +73,7 @@ export class Service {
     const resp = await axios({
       url: "https://api.weixin.qq.com/wxa/getwxacodeunlimit",
       method: "post",
-      timeout,
+      timeout: this.args.timeout,
       params: {
         access_token: accessToken,
       },
@@ -94,7 +86,7 @@ export class Service {
   }
 
   public async getAccessToken() {
-    const { appId, secret } = this.args;
+    const { appId, secret, timeout } = this.args;
     const resp = await axios({
       url: "https://api.weixin.qq.com/cgi-bin/token",
       timeout,
@@ -111,7 +103,7 @@ export class Service {
     const resp = await axios({
       url: "https://api.weixin.qq.com/cgi-bin/message/custom/send",
       method: "post",
-      timeout,
+      timeout: this.args.timeout,
       params: {
         access_token: accessToken,
       },
@@ -124,7 +116,7 @@ export class Service {
     const resp = await axios({
       url: "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send",
       method: "post",
-      timeout,
+      timeout: this.args.timeout,
       params: {
         access_token: accessToken,
       },
@@ -142,7 +134,7 @@ export class Service {
     const resp = await axios({
       url: "https://api.weixin.qq.com/cgi-bin/media/upload",
       method: "post",
-      timeout,
+      timeout: this.args.timeout,
       params: {
         access_token: accessToken,
         type: "image",
@@ -195,6 +187,8 @@ export class Service {
     }
   }
 }
+
+export const init = createInitFn(Service);
 
 export class WechatLiteRequestError extends Error {}
 export class WechatLiteArgError extends Error {}

@@ -19,7 +19,7 @@ const options = {
           freezeTableName: true,
         },
       },
-      load,
+      setup,
     },
   } as Sequelize.Option<Sequelize.Service>,
 };

@@ -1,4 +1,4 @@
-import { ServiceOption, InitOption } from "use-services";
+import { ServiceOption, InitOption, createInitFn } from "use-services";
 import OSS from "ali-oss";
 
 export type Option<S extends Service> = ServiceOption<Args, S>;
@@ -15,26 +15,6 @@ export interface Args {
       timeout?: number;
     };
   };
-}
-
-export async function init<S extends Service>(
-  option: InitOption<Args, S>
-): Promise<S> {
-  const srv = new (option.ctor || Service)(option);
-  return srv as S;
-}
-
-export interface STSData {
-  bucket: string;
-  region: string;
-  credentials: Credentials;
-}
-
-export interface Credentials {
-  AccessKeyId: string;
-  AccessKeySecret: string;
-  Expiration: string;
-  SecurityToken: string;
 }
 
 export class Service {
@@ -70,4 +50,19 @@ export class Service {
       credentials,
     };
   }
+}
+
+export const init = createInitFn(Service);
+
+export interface STSData {
+  bucket: string;
+  region: string;
+  credentials: Credentials;
+}
+
+export interface Credentials {
+  AccessKeyId: string;
+  AccessKeySecret: string;
+  Expiration: string;
+  SecurityToken: string;
 }

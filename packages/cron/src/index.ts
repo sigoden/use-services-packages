@@ -1,9 +1,8 @@
 import {
   ServiceOption,
   InitOption,
-  INIT_KEY,
   STOP_KEY,
-  eventNames,
+  SERVICES_EVENTS,
 } from "use-services";
 import cronParser from "cron-parser";
 import { Service as IORedisService } from "@use-services/ioredis";
@@ -18,14 +17,6 @@ export interface Args<A> {
 
 export type Deps = [IORedisService];
 
-export async function init<A, S extends Service<A>>(
-  option: InitOption<Args<A>, S>
-): Promise<S> {
-  const srv = new (option.ctor || Service)(option);
-  option.emitter.on(eventNames.initAll, () => srv[INIT_KEY]());
-  return srv as S;
-}
-
 const lockScript = `
   if redis.call("exists", KEYS[1]) == 1 then
     return 0
@@ -33,13 +24,6 @@ const lockScript = `
   redis.call("set", KEYS[1], ARGV[1], "PX", ARGV[2])
   return 1
 `;
-
-export type Context = {
-  name: string;
-  cron: string;
-  nextRunAt: Date;
-  runAts: Date[];
-};
 
 export class Service<A> {
   private args: Args<A>;
@@ -63,7 +47,7 @@ export class Service<A> {
     this._checkHandlers();
   }
 
-  public async [INIT_KEY]() {
+  public async start() {
     if (this.initialized) {
       return;
     }
@@ -164,3 +148,18 @@ export class Service<A> {
     }
   }
 }
+
+export async function init<A, S extends Service<A>>(
+  option: InitOption<Args<A>, S>
+): Promise<S> {
+  const srv = new (option.ctor || Service)(option);
+  option.emitter.on(SERVICES_EVENTS.INIT_END, () => srv.start());
+  return srv as S;
+}
+
+export type Context = {
+  name: string;
+  cron: string;
+  nextRunAt: Date;
+  runAts: Date[];
+};

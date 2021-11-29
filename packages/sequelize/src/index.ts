@@ -6,10 +6,16 @@ export type Args = {
   username: string;
   password: string;
   options?: Options;
-  load: (sql: Sequelize) => Promise<void>;
+  setup: (sql: Sequelize) => Promise<void>;
 };
 
 export type Option<S extends Service> = ServiceOption<Args, S>;
+
+export class Service extends Sequelize {
+  public [STOP_KEY]() {
+    return this.close();
+  }
+}
 
 export async function init<S extends Service>(
   option: InitOption<Args, S>
@@ -22,12 +28,6 @@ export async function init<S extends Service>(
     options
   );
   await srv.authenticate();
-  await option.args.load(srv);
+  await option.args.setup(srv);
   return srv as S;
-}
-
-export class Service extends Sequelize {
-  public [STOP_KEY]() {
-    return this.close();
-  }
 }

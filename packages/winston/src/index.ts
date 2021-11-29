@@ -1,5 +1,5 @@
 import * as winston from "winston";
-import { ServiceOption, InitOption } from "use-services";
+import { ServiceOption, InitOption, createInitFn } from "use-services";
 const { combine } = winston.format;
 
 export interface Args {
@@ -14,13 +14,6 @@ export interface Args {
 }
 
 export type Option<S extends Service> = ServiceOption<Args, S>;
-
-export async function init<S extends Service>(
-  option: InitOption<Args, S>
-): Promise<S> {
-  const srv = new (option.ctor || Service)(option);
-  return srv as S;
-}
 
 export class Service {
   public readonly loggers?: winston.Logger[];
@@ -94,6 +87,8 @@ export class Service {
     return isPlainObject(extra) ? extra : { extra };
   }
 }
+
+export const init = createInitFn(Service);
 
 function isPlainObject(obj: any) {
   return Object.prototype.toString.call(obj) === "[object Object]";

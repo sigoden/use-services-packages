@@ -1,4 +1,4 @@
-import { ServiceOption, InitOption } from "use-services";
+import { ServiceOption, InitOption, createInitFn } from "use-services";
 import Client from "@alicloud/pop-core";
 
 export type Option<A, S extends Service<A>> = ServiceOption<Args<A>, S>;
@@ -8,21 +8,6 @@ export interface Args<A> {
   accessKeySecret: string;
   defaultSignName: string;
   templates: Templates<A>;
-}
-
-export type Templates<A> = {
-  [k in keyof A]: {
-    signName?: string;
-    templateCode: string;
-    templateContent?: string;
-  };
-};
-
-export async function init<A, S extends Service<A>>(
-  option: InitOption<Args<A>, S>
-): Promise<S> {
-  const srv = new (option.ctor || Service)(option);
-  return srv as S;
 }
 
 const defaultConfig = {
@@ -88,6 +73,16 @@ export class Service<A> {
     });
   }
 }
+
+export const init = createInitFn(Service);
+
+export type Templates<A> = {
+  [k in keyof A]: {
+    signName?: string;
+    templateCode: string;
+    templateContent?: string;
+  };
+};
 
 export interface SendResult {
   Message: string;

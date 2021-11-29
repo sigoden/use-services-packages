@@ -3,14 +3,6 @@ import { Service as IORedisService } from "@use-services/ioredis";
 
 export type Option<A, S extends Service<A>> = ServiceOption<A, S>;
 
-export async function init<A, S extends Service<A>>(
-  option: InitOption<A, S>
-): Promise<S> {
-  const srv = new (option.ctor || Service)(option);
-  await srv.load();
-  return srv as S;
-}
-
 export type Deps = [IORedisService];
 
 export class Service<A> {
@@ -48,4 +40,12 @@ export class Service<A> {
     }
     return this.data;
   }
+}
+
+export async function init<A, S extends Service<A>>(
+  option: InitOption<A, S>
+): Promise<S> {
+  const srv = new (option.ctor || Service)(option);
+  await srv.load();
+  return srv as S;
 }
