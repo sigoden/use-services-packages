@@ -29,6 +29,6 @@
   "dependencies": {
     "@use-services/ioredis": "workspace:^",
     "cron-parser": "^3.5.0",
-    "use-services": "^1.2.0"
+    "use-services": "^1.2.1"
   }
 }

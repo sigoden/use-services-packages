@@ -29,6 +29,6 @@
   },
   "dependencies": {
     "sequelize": "^6.6.5",
-    "use-services": "^1.2.0"
+    "use-services": "^1.2.1"
   }
 }

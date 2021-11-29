@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "ejs": "^3.1.6",
-    "use-services": "^1.2.0",
+    "use-services": "^1.2.1",
     "wechat-crypto": "^0.0.2",
     "xml2js": "^0.4.23"
   }

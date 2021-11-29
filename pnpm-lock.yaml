@@ -32,114 +32,114 @@ importers:
     specifiers:
       '@types/ali-oss': ^6.16.1
       ali-oss: ^6.16.0
-      use-services: ^1.2.0
+      use-services: ^1.2.1
     dependencies:
       '@types/ali-oss': 6.16.2
       ali-oss: 6.16.0
-      use-services: 1.2.0
+      use-services: 1.2.1
 
   packages/alisms:
     specifiers:
       '@alicloud/pop-core': ^1.7.10
-      use-services: ^1.2.0
+      use-services: ^1.2.1
     dependencies:
       '@alicloud/pop-core': 1.7.10
-      use-services: 1.2.0
+      use-services: 1.2.1
 
   packages/cron:
     specifiers:
       '@use-services/ioredis': workspace:^
       cron-parser: ^3.5.0
-      use-services: ^1.2.0
+      use-services: ^1.2.1
     dependencies:
       '@use-services/ioredis': link:../ioredis
       cron-parser: 3.5.0
-      use-services: 1.2.0
+      use-services: 1.2.1
 
   packages/delayqueue:
     specifiers:
       '@use-services/ioredis': workspace:^
       lodash: ^4.17.21
       p-limit: ^4.0.0
-      use-services: ^1.2.0
+      use-services: ^1.2.1
     dependencies:
       '@use-services/ioredis': link:../ioredis
       lodash: 4.17.21
       p-limit: 4.0.0
-      use-services: 1.2.0
+      use-services: 1.2.1
 
   packages/dynconf:
     specifiers:
       '@use-services/ioredis': workspace:^
-      use-services: ^1.2.0
+      use-services: ^1.2.1
     dependencies:
       '@use-services/ioredis': link:../ioredis
-      use-services: 1.2.0
+      use-services: 1.2.1
 
   packages/echo:
     specifiers:
-      use-services: ^1.2.0
+      use-services: ^1.2.1
     dependencies:
-      use-services: 1.2.0
+      use-services: 1.2.1
 
   packages/httperr:
     specifiers:
       lodash: ^4.17.21
-      use-services: ^1.2.0
+      use-services: ^1.2.1
     dependencies:
       lodash: 4.17.21
-      use-services: 1.2.0
+      use-services: 1.2.1
 
   packages/ioredis:
     specifiers:
       '@types/ioredis': ^4.27.1
-      use-services: ^1.2.0
+      use-services: ^1.2.1
     dependencies:
       '@types/ioredis': 4.28.1
-      use-services: 1.2.0
+      use-services: 1.2.1
 
   packages/sequelize:
     specifiers:
       sequelize: ^6.6.5
-      use-services: ^1.2.0
+      use-services: ^1.2.1
     dependencies:
       sequelize: 6.11.0
-      use-services: 1.2.0
+      use-services: 1.2.1
 
   packages/wechatlite:
     specifiers:
       axios: ^0.21.1
-      use-services: ^1.2.0
+      use-services: ^1.2.1
     dependencies:
       axios: 0.21.4
-      use-services: 1.2.0
+      use-services: 1.2.1
 
   packages/wechatpub:
     specifiers:
       axios: ^0.21.1
-      use-services: ^1.2.0
+      use-services: ^1.2.1
     dependencies:
       axios: 0.21.4
-      use-services: 1.2.0
+      use-services: 1.2.1
 
   packages/wechatsub:
     specifiers:
       ejs: ^3.1.6
-      use-services: ^1.2.0
+      use-services: ^1.2.1
       wechat-crypto: ^0.0.2
       xml2js: ^0.4.23
     dependencies:
       ejs: 3.1.6
-      use-services: 1.2.0
+      use-services: 1.2.1
       wechat-crypto: 0.0.2
       xml2js: 0.4.23
 
   packages/winston:
     specifiers:
-      use-services: ^1.2.0
+      use-services: ^1.2.1
       winston: ^3.3.3
     dependencies:
-      use-services: 1.2.0
+      use-services: 1.2.1
       winston: 3.3.3
 
 packages:
@@ -4232,8 +4232,8 @@ packages:
       - supports-color
     dev: false
 
-  /use-services/1.2.0:
-    resolution: {integrity: sha512-QYmzjzm/i/ISZwwvL86gs+B6O50iEeVR2PzD01513qoPNfN7ux8BR9XGTLh2uesr/Is8IUg8tqekdL9X/RxvOw==}
+  /use-services/1.2.1:
+    resolution: {integrity: sha512-Dk8OVAyIAphM/WX8P2cnuw4Tsrv+dwvG9K5jeBIJUTQsQwXglnA6gTOtXUv8mo0ksD/dEis+rDC3acj9NbTPLw==}
     dependencies:
       debug: 4.3.2
       p-event: 4.2.0

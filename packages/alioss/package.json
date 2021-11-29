@@ -29,6 +29,6 @@
   "dependencies": {
     "@types/ali-oss": "^6.16.1",
     "ali-oss": "^6.16.0",
-    "use-services": "^1.2.0"
+    "use-services": "^1.2.1"
   }
 }

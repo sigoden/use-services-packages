@@ -28,6 +28,6 @@
   },
   "dependencies": {
     "@use-services/ioredis": "workspace:^",
-    "use-services": "^1.2.0"
+    "use-services": "^1.2.1"
   }
 }

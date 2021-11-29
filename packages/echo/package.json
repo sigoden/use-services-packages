@@ -27,6 +27,6 @@
     "prepublishOnly": "npm run -s clean && npm run -s build"
   },
   "dependencies": {
-    "use-services": "^1.2.0"
+    "use-services": "^1.2.1"
   }
 }
