@@ -4,7 +4,7 @@ import {
   STOP_KEY,
   SERVICES_EVENTS,
 } from "use-services";
-import cronParser from "cron-parser";
+import * as cronParser from "cron-parser";
 import { Service as IORedisService } from "@use-services/ioredis";
 
 export type Option<A, S extends Service<A>> = ServiceOption<Args<A>, S>;
