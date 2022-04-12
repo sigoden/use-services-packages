@@ -2,7 +2,7 @@
 
 ```ts
 // in service.ts
-import * as DelayQueue from "@/lib/services/delayqueue";
+import * as DelayQueue from "@use-services/delayqueue";
 import * as handlersDelayQueue from "@/handlersDelayQueue";
 import { DelayQueueData } from "@/type";
 
@@ -30,7 +30,7 @@ export interface DelayQueueData {
 export type PropType<X, Y extends keyof X> = X[Y];
 
 // in handlersDelayQueue.ts
-import { Context } from "@/lib/services/delayqueue";
+import { Context } from "@@use-services/delayqueue";
 import { PropType, DelayQueueData } from "@/type";
 export async function dealPingPayOrder(ctx: Context<PropType<DelayQueueData, "dealPingPayOrder">>) {}
 
