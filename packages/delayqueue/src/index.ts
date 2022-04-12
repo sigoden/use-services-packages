@@ -268,7 +268,7 @@ export class Service<A> {
           this.args.pollInterval * 1.1
         );
         if (task) {
-          const { data = null, publishAt = -1 } = JSON.parse(task);
+          const { data = null, publishAt = -1 } = JSON.parse(task as any);
           let isAcked = false;
           const ack = () => {
             if (!isAcked) {

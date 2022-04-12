@@ -1,7 +1,7 @@
-import IORedis from "ioredis";
+import IORedis, { RedisOptions } from "ioredis";
 import { ServiceOption, InitOption, STOP_KEY } from "use-services";
 
-export type Args = IORedis.RedisOptions;
+export type Args = RedisOptions;
 export type Option<S extends Service> = ServiceOption<Args, S>;
 
 export class Service extends IORedis {

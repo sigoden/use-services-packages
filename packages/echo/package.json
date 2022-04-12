@@ -1,6 +1,6 @@
 {
   "name": "@use-services/echo",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "keywords": [
     "use-services",
     "echo"
@@ -28,6 +28,6 @@
     "prepublishOnly": "npm run -s clean && npm run -s build"
   },
   "dependencies": {
-    "use-services": "^1.3.0"
+    "use-services": "^1.3.1"
   }
 }
