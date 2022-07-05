@@ -25,7 +25,7 @@ export type Deps = [IORedisService];
 
 const KEY_SEP = "@@@";
 
-const getTaskScript = `
+const TASK_SCRIPT = `
 --[[
  Input:
       kEYS[1] ids key
@@ -60,6 +60,10 @@ export class Service<A> {
     }
     this.ns = option.app + ":" + option.srvName;
     this.redis = option.deps[0];
+    this.redis.defineCommand("__delayqueueTask", {
+      numberOfKeys: 5,
+      lua: TASK_SCRIPT,
+    });
     this.args = Object.assign(
       {
         pollInterval: 1000,
@@ -225,7 +229,7 @@ export class Service<A> {
     if (this.timer) clearTimeout(this.timer);
     this.timer = setTimeout(() => {
       this._runInterval();
-    }, pollInterval + (Math.random() - 0.5) * 100);
+    }, pollInterval);
     const { redis } = this;
     const queueValues = await redis.zrangebyscore(
       this.idsKey,
@@ -257,9 +261,7 @@ export class Service<A> {
       const task = async () => {
         const scheduleAt: string = queueValues[i + 1];
         const handler = handlers[name];
-        const task = await redis.eval(
-          getTaskScript,
-          5,
+        const task = await (redis as any).__delayqueueTask(
           this.idsKey,
           this.pendingIdsKey,
           key,
