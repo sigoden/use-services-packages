@@ -17,7 +17,7 @@ export interface Args<A> {
 
 export type Deps = [IORedisService];
 
-const lockScript = `
+const LOCK_SCRIPT = `
   if redis.call("exists", KEYS[1]) == 1 then
     return 0
   end
@@ -29,7 +29,6 @@ export class Service<A> {
   private args: Args<A>;
   private redis: IORedisService;
   private initialized = false;
-  private lastLock = false;
   private ns: string;
   private timer: NodeJS.Timeout; // eslint-disable-line
   constructor(option: InitOption<Args<A>, Service<A>>) {
@@ -38,6 +37,10 @@ export class Service<A> {
     }
     this.ns = option.app + ":" + option.srvName;
     this.redis = option.deps[0];
+    this.redis.defineCommand("__cronLock", {
+      numberOfKeys: 1,
+      lua: LOCK_SCRIPT,
+    });
     this.args = Object.assign(
       {
         pollInterval: 500,
@@ -61,14 +64,8 @@ export class Service<A> {
   }
 
   private _addInterval() {
-    let timeoutMs: number;
-    if (this.lastLock) {
-      timeoutMs = this.args.pollInterval + 50;
-    } else {
-      timeoutMs = this.args.pollInterval + 100 * (Math.random() - 0.5);
-    }
     if (this.timer) clearTimeout(this.timer);
-    this.timer = setTimeout(() => this._runinterval(), timeoutMs);
+    this.timer = setTimeout(() => this._runinterval(), this.args.pollInterval);
   }
 
   private async _runinterval() {
@@ -76,15 +73,12 @@ export class Service<A> {
     const keyLock = this._redisKey("lock");
 
     // 只有一个进程获得了锁
-    const result = await this.redis.eval(
-      lockScript,
-      1,
+    const result = await (this.redis as any).__cronLock(
       keyLock,
       "",
-      this.args.pollInterval * 1.1
+      this.args.pollInterval
     );
     if (result === 0) return;
-    this.lastLock = true;
 
     const now = Date.now();
     const sec = Math.floor(Date.now() / 1000);
