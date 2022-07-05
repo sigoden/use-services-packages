@@ -28,7 +28,7 @@
     "prepublishOnly": "npm run -s clean && npm run -s build"
   },
   "dependencies": {
-    "@alicloud/pop-core": "^1.7.10",
+    "@alicloud/pop-core": "^1.7.12",
     "use-services": "^1.3.1"
   }
 }

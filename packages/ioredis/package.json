@@ -28,7 +28,7 @@
     "prepublishOnly": "npm run -s clean && npm run -s build"
   },
   "dependencies": {
-    "ioredis": "^5.0.4",
+    "ioredis": "^5.1.0",
     "use-services": "^1.3.1"
   }
 }

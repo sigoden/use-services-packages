@@ -28,7 +28,7 @@
     "prepublishOnly": "npm run -s clean && npm run -s build"
   },
   "dependencies": {
-    "ejs": "^3.1.6",
+    "ejs": "^3.1.8",
     "use-services": "^1.3.1",
     "wechat-crypto": "^0.0.2",
     "xml2js": "^0.4.23"
